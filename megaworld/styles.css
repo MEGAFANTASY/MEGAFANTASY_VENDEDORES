@@ -46,12 +46,12 @@ body.admin-body {
 
 h1 {
   font-size: clamp(1.6rem, 6vw, 2rem);
-  color: #9ca3af;
+  color: var(--company-color);
   margin-bottom: 8px;
   text-transform: uppercase;
   font-weight: 300;
   letter-spacing: clamp(1px, 0.4vw, 3px);
-  text-shadow: 0 0 18px rgba(156, 163, 175, 0.4);
+  text-shadow: 0 0 18px rgba(17, 24, 39, 0.4);
 }
 
 p {
@@ -77,29 +77,29 @@ input::placeholder {
 
 input:focus {
   outline: none;
-  border-color: #9ca3af;
-  box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.25);
+  border-color: var(--company-color);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25);
 }
 
 button {
   width: 100%;
   padding: clamp(12px, 3.5vw, 16px);
   margin-top: 4px;
-  background: rgba(17, 24, 39, 0.85);
+  background: rgba(220, 38, 38, 0.85);
   color: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(75, 85, 99, 0.6);
+  border: 1px solid rgba(220, 38, 38, 0.5);
   border-radius: 12px;
   font-size: clamp(0.85rem, 2.6vw, 0.95rem);
   font-weight: 500;
   letter-spacing: clamp(0.5px, 0.2vw, 2px);
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 0 16px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 16px rgba(220, 38, 38, 0.25);
 }
 
 button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 0 24px rgba(156, 163, 175, 0.25);
+  box-shadow: 0 0 24px rgba(220, 38, 38, 0.45);
 }
 
 .back {
@@ -283,8 +283,116 @@ button:hover {
   color: rgba(255, 255, 255, 0.85);
 }
 
+.data-table td.estatus-cell {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: clamp(0.7rem, 2vw, 0.8rem);
+}
+
+.data-table td.estatus-cell.auditoria {
+  color: #38bdf8;
+}
+
+.data-table td.estatus-cell.vencida {
+  color: #f87171;
+}
+
+.data-table td.estatus-cell.programar {
+  color: #fbbf24;
+}
+
+.data-table td.estatus-cell.vigente {
+  color: #34d399;
+}
+
 .data-table td.actions {
   white-space: nowrap;
+}
+
+/* Cartera filters */
+.cartera-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(12px, 3vw, 18px);
+  align-items: center;
+  margin-bottom: clamp(18px, 4vw, 24px);
+}
+
+#search-cartera,
+.search-input {
+  flex: 1 1 240px;
+  min-width: 200px;
+  margin-bottom: 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.95);
+  padding: clamp(10px, 3vw, 14px) clamp(14px, 4vw, 18px);
+  font-size: clamp(0.85rem, 2.6vw, 0.95rem);
+}
+
+#search-cartera::placeholder,
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.status-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1 1 auto;
+}
+
+.status-btn {
+  width: auto;
+  padding: clamp(8px, 2.5vw, 10px) clamp(12px, 3.5vw, 18px);
+  margin-top: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: clamp(0.75rem, 2.2vw, 0.85rem);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: none;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.status-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.95);
+  transform: none;
+  box-shadow: none;
+}
+
+.status-btn.active {
+  background: var(--company-color);
+  border-color: var(--company-color);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(220, 38, 38, 0.3);
+}
+
+@media (max-width: 720px) {
+  .cartera-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #search-cartera,
+  .search-input {
+    width: 100%;
+    flex: none;
+  }
+
+  .status-filters {
+    justify-content: stretch;
+  }
+
+  .status-btn {
+    flex: 1 1 auto;
+    text-align: center;
+  }
 }
 
 .icon-link,

@@ -112,7 +112,7 @@ class SPAHandler(SimpleHTTPRequestHandler):
             conn = sqlite3.connect(db_path)
             conn.row_factory = sqlite3.Row
             query = '''
-                SELECT dias, cliente, direccion, ciudad, factura, saldo, url_factura, url_guia
+                SELECT dias, cliente, direccion, ciudad, factura, saldo, estatus, url_factura, url_guia
                 FROM facturas
             '''
             args = []

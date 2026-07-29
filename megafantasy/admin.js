@@ -8,6 +8,10 @@ const role = localStorage.getItem(roleKey) || 'vendedor';
 const vendedorName = localStorage.getItem(vendedorKey) || '';
 const isAdmin = role === 'admin';
 
+let allFacturas = [];
+let currentStatus = 'todas';
+let currentSearch = '';
+
 function checkAuth() {
   if (localStorage.getItem(sessionKey) !== 'true') {
     localStorage.removeItem(sessionKey);
@@ -37,11 +41,64 @@ function showSection(name) {
   document.getElementById(`btn-${name}`).classList.add('active');
 }
 
-async function loadCartera() {
-  const loading = document.getElementById('cartera-loading');
+function renderCartera(facturas) {
   const tableWrap = document.getElementById('cartera-table-wrap');
   const empty = document.getElementById('cartera-empty');
   const tbody = document.getElementById('cartera-body');
+
+  if (facturas.length === 0) {
+    tableWrap.classList.add('hidden');
+    empty.classList.remove('hidden');
+    return;
+  }
+
+  empty.classList.add('hidden');
+  tbody.innerHTML = facturas.map(row => `
+    <tr>
+      <td data-label="Días">${escapeHtml(row.dias)}</td>
+      <td data-label="Cliente">${escapeHtml(row.cliente)}</td>
+      <td data-label="Dirección">${escapeHtml(row.direccion)}</td>
+      <td data-label="Ciudad">${escapeHtml(row.ciudad)}</td>
+      <td data-label="Factura">${escapeHtml(row.factura)}</td>
+      <td data-label="Saldo">${formatCurrency(row.saldo)}</td>
+      <td data-label="Estatus" class="estatus-cell ${escapeHtml((row.estatus || '').toString().toLowerCase().replace(/\s/g, '-'))}">${escapeHtml(row.estatus || '')}</td>
+      <td data-label="Docs" class="actions">
+        ${row.url_factura ? `<a href="${escapeHtml(row.url_factura)}" target="_blank" rel="noopener" class="icon-link" title="Factura">📄</a>` : '<span class="icon-disabled">📄</span>'}
+        ${row.url_guia ? `<a href="${escapeHtml(row.url_guia)}" target="_blank" rel="noopener" class="icon-link" title="Guía">🚚</a>` : '<span class="icon-disabled">🚚</span>'}
+      </td>
+    </tr>
+  `).join('');
+
+  tableWrap.classList.remove('hidden');
+}
+
+function applyFilters() {
+  const term = currentSearch.toLowerCase().trim();
+  const statusNorm = currentStatus.toLowerCase().trim();
+
+  let filtered = allFacturas;
+
+  if (statusNorm && statusNorm !== 'todas') {
+    filtered = filtered.filter(row => {
+      const rowStatus = (row.estatus || '').toString().toLowerCase().trim();
+      return rowStatus === statusNorm;
+    });
+  }
+
+  if (term) {
+    filtered = filtered.filter(row => {
+      const cliente = (row.cliente || '').toString().toLowerCase();
+      const factura = (row.factura || '').toString().toLowerCase();
+      const ciudad = (row.ciudad || '').toString().toLowerCase();
+      return cliente.includes(term) || factura.includes(term) || ciudad.includes(term);
+    });
+  }
+
+  renderCartera(filtered);
+}
+
+async function loadCartera() {
+  const loading = document.getElementById('cartera-loading');
 
   const url = isAdmin
     ? `/api/cartera?bodega=${company}`
@@ -59,33 +116,33 @@ async function loadCartera() {
       return;
     }
 
-    const facturas = data.facturas || [];
-
-    if (facturas.length === 0) {
-      empty.classList.remove('hidden');
-      return;
-    }
-
-    tbody.innerHTML = facturas.map(row => `
-      <tr>
-        <td data-label="Días">${escapeHtml(row.dias)}</td>
-        <td data-label="Cliente">${escapeHtml(row.cliente)}</td>
-        <td data-label="Dirección">${escapeHtml(row.direccion)}</td>
-        <td data-label="Ciudad">${escapeHtml(row.ciudad)}</td>
-        <td data-label="Factura">${escapeHtml(row.factura)}</td>
-        <td data-label="Saldo">${formatCurrency(row.saldo)}</td>
-        <td data-label="Docs" class="actions">
-          ${row.url_factura ? `<a href="${escapeHtml(row.url_factura)}" target="_blank" rel="noopener" class="icon-link" title="Factura">📄</a>` : '<span class="icon-disabled">📄</span>'}
-          ${row.url_guia ? `<a href="${escapeHtml(row.url_guia)}" target="_blank" rel="noopener" class="icon-link" title="Guía">🚚</a>` : '<span class="icon-disabled">🚚</span>'}
-        </td>
-      </tr>
-    `).join('');
-
-    tableWrap.classList.remove('hidden');
+    allFacturas = data.facturas || [];
+    applyFilters();
   } catch (err) {
     loading.textContent = 'Error de conexión';
     loading.classList.remove('hidden');
   }
+}
+
+function setupFilters() {
+  const searchInput = document.getElementById('search-cartera');
+  const statusButtons = document.querySelectorAll('.status-btn');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      currentSearch = e.target.value;
+      applyFilters();
+    });
+  }
+
+  statusButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      statusButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentStatus = btn.dataset.status;
+      applyFilters();
+    });
+  });
 }
 
 async function loadVendedores() {
@@ -213,6 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   loadCartera();
+  setupFilters();
 
   if (isAdmin) {
     loadVendedores();

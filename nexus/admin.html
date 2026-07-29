@@ -19,6 +19,16 @@
   <main class="admin-main">
     <section id="section-cartera" class="admin-section active">
       <h2>Cartera</h2>
+      <div class="cartera-filters">
+        <input type="text" id="search-cartera" class="search-input" placeholder="Buscar por cliente, factura o ciudad..." />
+        <div class="status-filters">
+          <button class="status-btn active" data-status="todas">Todas</button>
+          <button class="status-btn" data-status="auditoria">Auditoria</button>
+          <button class="status-btn" data-status="vencida">Vencida</button>
+          <button class="status-btn" data-status="programar">Programar</button>
+          <button class="status-btn" data-status="vigente">Vigente</button>
+        </div>
+      </div>
       <div id="cartera-loading" class="loading">Cargando facturas...</div>
       <div id="cartera-table-wrap" class="table-wrap hidden">
         <table class="data-table">
@@ -30,6 +40,7 @@
               <th>Ciudad</th>
               <th>Factura</th>
               <th>Saldo</th>
+              <th>Estatus</th>
               <th>Docs</th>
             </tr>
           </thead>
