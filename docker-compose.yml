@@ -1,0 +1,7 @@
+services:
+  app-vendedores:
+    build: .
+    container_name: app-vendedores
+    ports:
+      - "9002:8000"
+    restart: unless-stopped
