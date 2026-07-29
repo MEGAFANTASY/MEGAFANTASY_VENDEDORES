@@ -102,7 +102,16 @@ class SPAHandler(SimpleHTTPRequestHandler):
 
     def translate_path(self, path):
         root = self.directory or os.getcwd()
-        abspath = os.path.join(root, path.lstrip('/'))
+        clean_path = path.lstrip('/')
+
+        # Serve /bodega/admin/ as /bodega/admin.html
+        parts = clean_path.split('/')
+        if len(parts) == 2 and parts[1] == 'admin' and parts[0] in BODEGAS:
+            admin_file = os.path.join(root, parts[0], 'admin.html')
+            if os.path.exists(admin_file):
+                return admin_file
+
+        abspath = os.path.join(root, clean_path)
         if os.path.isdir(abspath):
             index = os.path.join(abspath, 'index.html')
             if os.path.exists(index):

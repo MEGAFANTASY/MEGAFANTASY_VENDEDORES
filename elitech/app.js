@@ -1,7 +1,9 @@
 const company = window.location.pathname.split('/')[1] || 'elitech';
+const sessionKey = `session_${company}`;
+const usernameKey = `username_${company}`;
 
 // Si ya hay sesión activa para esta bodega, ir directo al admin
-if (localStorage.getItem('session_active') === 'true' && localStorage.getItem('company') === company) {
+if (localStorage.getItem(sessionKey) === 'true') {
   window.location.href = 'admin.html';
 }
 
@@ -31,9 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await response.json();
 
       if (response.ok && result.ok) {
-        localStorage.setItem('company', company);
-        localStorage.setItem('session_active', 'true');
-        localStorage.setItem('username', username);
+        localStorage.setItem(sessionKey, 'true');
+        localStorage.setItem(usernameKey, username);
         window.location.href = 'admin.html';
       } else {
         errorEl.textContent = result.error || 'Credenciales incorrectas';

@@ -1,12 +1,12 @@
 ﻿const company = window.location.pathname.split('/')[1] || 'megafantasy';
+const sessionKey = `session_${company}`;
+const usernameKey = `username_${company}`;
 
 function checkAuth() {
-  const stored = localStorage.getItem('company');
-  const sessionActive = localStorage.getItem('session_active');
-  if (!stored || stored !== company || sessionActive !== 'true') {
-    localStorage.removeItem('session_active');
-    localStorage.removeItem('username');
-    window.location.href = 'index.html';
+  if (localStorage.getItem(sessionKey) !== 'true') {
+    localStorage.removeItem(sessionKey);
+    localStorage.removeItem(usernameKey);
+    window.location.href = `/${company}/`;
   }
 }
 
@@ -82,10 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-cartera').addEventListener('click', () => showSection('cartera'));
   document.getElementById('btn-vendedores').addEventListener('click', () => showSection('vendedores'));
   document.getElementById('btn-logout').addEventListener('click', () => {
-    localStorage.removeItem('company');
-    localStorage.removeItem('session_active');
-    localStorage.removeItem('username');
-    window.location.href = 'index.html';
+    localStorage.removeItem(sessionKey);
+    localStorage.removeItem(usernameKey);
+    window.location.href = `/${company}/`;
   });
 
   loadCartera();
