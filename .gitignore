@@ -33,3 +33,13 @@ Thumbs.db
 
 # Docker (solo local)
 docker-compose.override.yml
+
+# Bases de datos SQLite generadas por la app
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs y datos temporales
+*.log
+logs/

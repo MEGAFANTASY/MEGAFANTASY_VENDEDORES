@@ -1,0 +1,39 @@
+function doGet(e) {
+  const hoja = e.parameter.hoja || 'megafantasy';
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(hoja);
+
+  if (!sheet) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ error: 'Hoja no encontrada: ' + hoja }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0].map(h => String(h).toLowerCase().trim().replace(/ /g, '_'));
+  const rows = [];
+
+  for (let i = 1; i < data.length; i++) {
+    const obj = {};
+    for (let j = 0; j < headers.length; j++) {
+      obj[headers[j]] = data[i][j];
+    }
+    rows.push(obj);
+  }
+
+  return ContentService
+    .createTextOutput(JSON.stringify(rows))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// Publicar como Web App:
+// 1. Abrir Google Sheets
+// 2. Extensiones > Apps Script
+// 3. Nuevo proyecto
+// 4. Pegar este codigo
+// 5. Guardar (Ctrl+S)
+// 6. Implementar > Nuevo implementacion > Web App
+// 7. Ejecutar como: Cualquiera
+// 8. Acceso: Cualquiera
+// 9. Copiar la URL generada
+// 10. Pegarla en docker-compose.yml en SHEETS_URL=
