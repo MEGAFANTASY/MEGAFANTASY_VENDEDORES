@@ -120,3 +120,251 @@ button:hover {
 @media (max-width: 360px) {
   body { padding: 14px; }
 }
+/* Admin panel styles */
+.admin-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(8px, 2vw, 16px);
+  padding: clamp(10px, 3vw, 14px) clamp(12px, 4vw, 24px);
+  background: rgba(15, 23, 42, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.admin-nav .brand {
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--company-color);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-nav .nav-actions {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 1.5vw, 12px);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.admin-nav .nav-btn {
+  width: auto;
+  padding: clamp(8px, 2.5vw, 12px) clamp(10px, 3vw, 16px);
+  margin: 0;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: clamp(0.75rem, 2.2vw, 0.85rem);
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.admin-nav .nav-btn:hover,
+.admin-nav .nav-btn.active {
+  background: var(--company-color);
+  border-color: var(--company-color);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
+}
+
+.admin-nav .nav-btn.logout {
+  border-color: rgba(255, 107, 107, 0.4);
+  color: rgba(255, 107, 107, 0.9);
+}
+
+.admin-nav .nav-btn.logout:hover {
+  background: rgba(255, 107, 107, 0.15);
+  border-color: rgba(255, 107, 107, 0.6);
+}
+
+.admin-main {
+  width: 100%;
+  max-width: min(1100px, 96vw);
+  margin: 0 auto;
+  padding: clamp(80px, 18vw, 110px) clamp(12px, 3vw, 24px) clamp(24px, 5vw, 40px);
+}
+
+.admin-section {
+  display: none;
+  animation: fadeIn 0.25s ease;
+}
+
+.admin-section.active {
+  display: block;
+}
+
+.admin-section h2 {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(1.2rem, 5vw, 1.6rem);
+  font-weight: 300;
+  margin-bottom: clamp(16px, 4vw, 24px);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.loading,
+.empty {
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: clamp(24px, 6vw, 40px);
+  font-size: clamp(0.9rem, 3vw, 1rem);
+}
+
+.empty {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.data-table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+  font-size: clamp(0.8rem, 2.4vw, 0.9rem);
+}
+
+.data-table thead {
+  background: var(--company-color);
+  color: #fff;
+}
+
+.data-table th,
+.data-table td {
+  padding: clamp(10px, 2.5vw, 14px) clamp(8px, 2vw, 12px);
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.data-table th {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.data-table td {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.data-table td.actions {
+  white-space: nowrap;
+}
+
+.icon-link,
+.icon-disabled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-right: 6px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.icon-link {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.icon-link:hover {
+  background: var(--company-color);
+  transform: scale(1.1);
+}
+
+.icon-disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile cards */
+@media (max-width: 720px) {
+  .admin-nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-nav .nav-actions {
+    justify-content: center;
+  }
+
+  .admin-main {
+    padding-top: clamp(120px, 30vw, 150px);
+  }
+
+  .data-table thead {
+    display: none;
+  }
+
+  .data-table,
+  .data-table tbody,
+  .data-table tr,
+  .data-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .data-table tr {
+    margin-bottom: 12px;
+    padding: clamp(12px, 3vw, 16px);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .data-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .data-table td:last-child {
+    border-bottom: none;
+  }
+
+  .data-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+
+  .data-table td.actions {
+    justify-content: flex-start;
+  }
+
+  .data-table td.actions::before {
+    display: none;
+  }
+}

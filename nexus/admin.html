@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin NEXUS</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="admin-nav">
+    <span class="brand">NEXUS</span>
+    <div class="nav-actions">
+      <button id="btn-cartera" class="nav-btn active">Cartera</button>
+      <button id="btn-vendedores" class="nav-btn">Vendedores</button>
+      <button id="btn-logout" class="nav-btn logout">Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <main class="admin-main">
+    <section id="section-cartera" class="admin-section active">
+      <h2>Cartera</h2>
+      <div id="cartera-loading" class="loading">Cargando facturas...</div>
+      <div id="cartera-table-wrap" class="table-wrap hidden">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Días</th>
+              <th>Cliente</th>
+              <th>Dirección</th>
+              <th>Ciudad</th>
+              <th>Factura</th>
+              <th>Saldo</th>
+              <th>Docs</th>
+            </tr>
+          </thead>
+          <tbody id="cartera-body"></tbody>
+        </table>
+      </div>
+      <div id="cartera-empty" class="empty hidden">No hay facturas registradas.</div>
+    </section>
+
+    <section id="section-vendedores" class="admin-section">
+      <h2>Vendedores</h2>
+      <p class="empty">Sección en construcción.</p>
+    </section>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>
+
