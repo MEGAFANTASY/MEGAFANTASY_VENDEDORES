@@ -24,6 +24,11 @@ body {
   padding: clamp(16px, 4vw, 40px);
 }
 
+body.admin-body {
+  display: block;
+  padding: 0;
+}
+
 .box {
   width: 100%;
   max-width: min(400px, 92vw);
@@ -61,7 +66,7 @@ input {
   margin-bottom: clamp(12px, 3vw, 16px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
-  font-size: clamp(0.9rem, 2.6vw, 1rem);
+  font-size: 16px;
   color: rgba(255, 255, 255, 0.95);
   background: rgba(255, 255, 255, 0.05);
 }
@@ -342,10 +347,11 @@ button:hover {
 
   .data-table td {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     padding: 8px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    gap: 10px;
   }
 
   .data-table td:last-child {
@@ -356,8 +362,9 @@ button:hover {
     content: attr(data-label);
     font-weight: 600;
     color: rgba(255, 255, 255, 0.6);
-    margin-right: 12px;
     flex-shrink: 0;
+    min-width: 80px;
+    text-align: left;
   }
 
   .data-table td.actions {
