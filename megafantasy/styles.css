@@ -247,6 +247,16 @@ button:hover {
   font-size: clamp(0.8rem, 2.4vw, 0.9rem);
 }
 
+@media (max-width: 720px) {
+  .table-wrap {
+    overflow-x: visible;
+  }
+
+  .data-table {
+    min-width: unset;
+  }
+}
+
 .data-table thead {
   background: var(--company-color);
   color: #fff;
