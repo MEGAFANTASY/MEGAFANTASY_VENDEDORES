@@ -3,6 +3,18 @@ from http.server import SimpleHTTPRequestHandler, HTTPServer
 import os
 
 class SPAHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        # Redirect /folder to /folder/ so relative paths resolve correctly
+        if self.path != '/' and not self.path.endswith('/'):
+            root = self.directory or os.getcwd()
+            abspath = os.path.join(root, self.path.lstrip('/'))
+            if os.path.isdir(abspath):
+                self.send_response(301)
+                self.send_header('Location', self.path + '/')
+                self.end_headers()
+                return
+        return super().do_GET()
+
     def translate_path(self, path):
         root = self.directory or os.getcwd()
         abspath = os.path.join(root, path.lstrip('/'))
