@@ -1,11 +1,19 @@
 ﻿const company = window.location.pathname.split('/')[1] || 'bluestar';
 const sessionKey = `session_${company}`;
 const usernameKey = `username_${company}`;
+const roleKey = `role_${company}`;
+const vendedorKey = `vendedor_${company}`;
+
+const role = localStorage.getItem(roleKey) || 'vendedor';
+const vendedorName = localStorage.getItem(vendedorKey) || '';
+const isAdmin = role === 'admin';
 
 function checkAuth() {
   if (localStorage.getItem(sessionKey) !== 'true') {
     localStorage.removeItem(sessionKey);
     localStorage.removeItem(usernameKey);
+    localStorage.removeItem(roleKey);
+    localStorage.removeItem(vendedorKey);
     window.location.href = `/${company}/`;
   }
 }
@@ -35,8 +43,12 @@ async function loadCartera() {
   const empty = document.getElementById('cartera-empty');
   const tbody = document.getElementById('cartera-body');
 
+  const url = isAdmin
+    ? `/api/cartera?bodega=${company}`
+    : `/api/cartera?bodega=${company}&vendedor=${encodeURIComponent(vendedorName)}`;
+
   try {
-    const response = await fetch(`/api/cartera?bodega=${company}`);
+    const response = await fetch(url);
     const data = await response.json();
 
     loading.classList.add('hidden');
@@ -76,17 +88,137 @@ async function loadCartera() {
   }
 }
 
+async function loadVendedores() {
+  const loading = document.getElementById('vendedores-loading');
+  const empty = document.getElementById('vendedores-empty');
+  const cards = document.getElementById('vendedores-cards');
+
+  try {
+    const response = await fetch(`/api/vendedores?bodega=${company}`);
+    const data = await response.json();
+
+    loading.classList.add('hidden');
+
+    if (!response.ok || data.error) {
+      loading.textContent = data.error || 'Error cargando vendedores';
+      loading.classList.remove('hidden');
+      return;
+    }
+
+    const vendedores = data.vendedores || [];
+
+    if (vendedores.length === 0) {
+      empty.classList.remove('hidden');
+      cards.classList.add('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    cards.innerHTML = vendedores.map(v => `
+      <div class="vendedor-card">
+        <div class="vendedor-nombre">${escapeHtml(v.vendedor)}</div>
+        <div class="vendedor-usuario">Usuario: ${escapeHtml(v.usuario)}</div>
+      </div>
+    `).join('');
+    cards.classList.remove('hidden');
+  } catch (err) {
+    loading.textContent = 'Error de conexión';
+    loading.classList.remove('hidden');
+  }
+}
+
+async function loadVendedoresDisponibles() {
+  const select = document.getElementById('select-vendedor');
+  select.innerHTML = '<option value="">Selecciona un vendedor</option>';
+  try {
+    const response = await fetch(`/api/vendedores-disponibles?bodega=${company}`);
+    const data = await response.json();
+    if (!response.ok || data.error) return;
+    const vendedores = data.vendedores || [];
+    vendedores.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v;
+      opt.textContent = v;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.error('Error cargando vendedores disponibles', err);
+  }
+}
+
+function openModal() {
+  document.getElementById('modal-vendedor').classList.remove('hidden');
+  document.getElementById('modal-error').textContent = '';
+  document.getElementById('select-vendedor').value = '';
+  document.getElementById('input-usuario').value = '';
+  document.getElementById('input-contrasena').value = '';
+  loadVendedoresDisponibles();
+}
+
+function closeModal() {
+  document.getElementById('modal-vendedor').classList.add('hidden');
+}
+
+async function saveVendedor() {
+  const vendedor = document.getElementById('select-vendedor').value.trim();
+  const usuario = document.getElementById('input-usuario').value.trim();
+  const contrasena = document.getElementById('input-contrasena').value;
+  const errorEl = document.getElementById('modal-error');
+  errorEl.textContent = '';
+
+  if (!vendedor || !usuario || !contrasena) {
+    errorEl.textContent = 'Completa todos los campos';
+    return;
+  }
+  if (contrasena.length < 4) {
+    errorEl.textContent = 'La contraseña debe tener mínimo 4 caracteres';
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/vendedores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bodega: company, vendedor, usuario, contrasena })
+    });
+    const result = await response.json();
+
+    if (response.ok && result.ok) {
+      closeModal();
+      await loadVendedores();
+    } else {
+      errorEl.textContent = result.error || 'Error guardando vendedor';
+    }
+  } catch (err) {
+    errorEl.textContent = 'Error de conexión';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   checkAuth();
+
+  if (!isAdmin) {
+    const btnVendedores = document.getElementById('btn-vendedores');
+    if (btnVendedores) btnVendedores.classList.add('hidden');
+  }
 
   document.getElementById('btn-cartera').addEventListener('click', () => showSection('cartera'));
   document.getElementById('btn-vendedores').addEventListener('click', () => showSection('vendedores'));
   document.getElementById('btn-logout').addEventListener('click', () => {
     localStorage.removeItem(sessionKey);
     localStorage.removeItem(usernameKey);
+    localStorage.removeItem(roleKey);
+    localStorage.removeItem(vendedorKey);
     window.location.href = `/${company}/`;
   });
 
   loadCartera();
+
+  if (isAdmin) {
+    loadVendedores();
+    document.getElementById('btn-add-vendedor').addEventListener('click', openModal);
+    document.getElementById('btn-cancelar-modal').addEventListener('click', closeModal);
+    document.getElementById('btn-guardar-vendedor').addEventListener('click', saveVendedor);
+  }
 });
 

@@ -385,3 +385,141 @@ button:hover {
     display: none;
   }
 }
+
+/* Vendedores panel */
+.vendedores-wrap {
+  margin-bottom: clamp(20px, 4vw, 28px);
+}
+
+.vendedores-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: clamp(12px, 3vw, 16px);
+}
+
+.vendedor-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: clamp(16px, 4vw, 20px);
+}
+
+.vendedor-nombre {
+  font-weight: 600;
+  color: var(--company-color);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  font-size: clamp(0.85rem, 2.6vw, 0.95rem);
+}
+
+.vendedor-usuario {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: clamp(0.8rem, 2.4vw, 0.9rem);
+}
+
+.add-vendedor-btn {
+  width: auto;
+  display: inline-block;
+  padding: clamp(12px, 3.5vw, 16px) clamp(20px, 5vw, 28px);
+  margin-top: 0;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 4vw, 40px);
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.modal-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: min(420px, 92vw);
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: clamp(24px, 6vw, 32px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h3 {
+  color: var(--company-color);
+  margin-bottom: clamp(18px, 4vw, 24px);
+  text-transform: uppercase;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.modal-content label {
+  display: block;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: clamp(0.75rem, 2.2vw, 0.85rem);
+  font-weight: 500;
+  margin-bottom: 6px;
+  margin-top: 12px;
+}
+
+.modal-content select,
+.modal-content input {
+  width: 100%;
+  padding: clamp(12px, 3.5vw, 14px) clamp(14px, 4vw, 16px);
+  margin-bottom: 4px;
+}
+
+.modal-content select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 16px;
+}
+
+.modal-content select option {
+  background: #1e293b;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: clamp(18px, 4vw, 24px);
+}
+
+.modal-actions .nav-btn {
+  flex: 1;
+}
+
+.modal-actions .nav-btn:last-child {
+  background: var(--company-color);
+  border-color: var(--company-color);
+  color: #fff;
+}
+
+.modal-actions .nav-btn:last-child:hover {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+#modal-error {
+  margin-top: 10px;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+@media (max-width: 420px) {
+  .modal-actions {
+    flex-direction: column;
+  }
+}

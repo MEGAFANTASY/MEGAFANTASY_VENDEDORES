@@ -41,9 +41,34 @@
 
     <section id="section-vendedores" class="admin-section">
       <h2>Vendedores</h2>
-      <p class="empty">Sección en construcción.</p>
+      <div id="vendedores-list-wrap" class="vendedores-wrap">
+        <div id="vendedores-loading" class="loading">Cargando vendedores...</div>
+        <div id="vendedores-empty" class="empty hidden">No hay vendedores creados.</div>
+        <div id="vendedores-cards" class="vendedores-cards hidden"></div>
+      </div>
+      <button id="btn-add-vendedor" class="add-vendedor-btn">Agregar vendedor</button>
     </section>
   </main>
+
+  <div id="modal-vendedor" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h3>Crear usuario vendedor</h3>
+      <label for="select-vendedor">VENDEDOR</label>
+      <select id="select-vendedor">
+        <option value="">Selecciona un vendedor</option>
+      </select>
+      <label for="input-usuario">USUARIO</label>
+      <input type="text" id="input-usuario" placeholder="Ej: LAZARO" />
+      <label for="input-contrasena">CONTRASEÑA</label>
+      <input type="password" id="input-contrasena" placeholder="Mínimo 4 caracteres" />
+      <div id="modal-error" class="error"></div>
+      <div class="modal-actions">
+        <button id="btn-cancelar-modal" class="nav-btn">Cancelar</button>
+        <button id="btn-guardar-vendedor" class="nav-btn">Guardar</button>
+      </div>
+    </div>
+  </div>
 
   <script src="admin.js"></script>
 </body>
