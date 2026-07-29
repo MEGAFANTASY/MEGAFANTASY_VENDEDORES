@@ -2,7 +2,10 @@
 
 function checkAuth() {
   const stored = localStorage.getItem('company');
-  if (!stored || stored !== company) {
+  const sessionActive = localStorage.getItem('session_active');
+  if (!stored || stored !== company || sessionActive !== 'true') {
+    localStorage.removeItem('session_active');
+    localStorage.removeItem('username');
     window.location.href = 'index.html';
   }
 }
@@ -80,6 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-vendedores').addEventListener('click', () => showSection('vendedores'));
   document.getElementById('btn-logout').addEventListener('click', () => {
     localStorage.removeItem('company');
+    localStorage.removeItem('session_active');
+    localStorage.removeItem('username');
     window.location.href = 'index.html';
   });
 

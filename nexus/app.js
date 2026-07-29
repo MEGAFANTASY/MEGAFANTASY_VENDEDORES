@@ -1,5 +1,10 @@
 const company = window.location.pathname.split('/')[1] || 'nexus';
 
+// Si ya hay sesión activa para esta bodega, ir directo al admin
+if (localStorage.getItem('session_active') === 'true' && localStorage.getItem('company') === company) {
+  window.location.href = 'admin.html';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const submitBtn = document.getElementById('submit');
   const errorEl = document.getElementById('error');
@@ -27,6 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (response.ok && result.ok) {
         localStorage.setItem('company', company);
+        localStorage.setItem('session_active', 'true');
+        localStorage.setItem('username', username);
         window.location.href = 'admin.html';
       } else {
         errorEl.textContent = result.error || 'Credenciales incorrectas';
