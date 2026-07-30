@@ -567,11 +567,22 @@ button:hover {
   .cartera-filters {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
   }
 
   .filter-row {
     flex-direction: column;
     align-items: stretch;
+    gap: 8px;
+  }
+
+  .ciudades-dropdown,
+  .status-filters {
+    width: 100%;
+  }
+
+  .ciudades-trigger {
+    width: 100%;
   }
 
   #search-cartera,
@@ -805,7 +816,11 @@ button:hover {
   }
 
   .admin-main {
-    padding-top: clamp(120px, 30vw, 150px);
+    padding-top: clamp(148px, 38vw, 180px);
+  }
+
+  .cartera-header {
+    margin-top: clamp(10px, 3vw, 16px);
   }
 
   .data-table thead {
