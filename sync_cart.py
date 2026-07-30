@@ -1,7 +1,7 @@
 import os
 import re
 
-ROOT = r"F:\3. MEGAFANTASY\2. APP-VENDEDORES"
+ROOT = r"/mnt/f/3. MEGAFANTASY/2. APP-VENDEDORES"
 SOURCE = os.path.join(ROOT, "megafantasy")
 TARGETS = ["bluestar", "nexus", "megaworld", "elitech"]
 
@@ -29,9 +29,30 @@ def build_facturas_html(source_html, target):
     return html
 
 def patch_admin_html(admin_html, cart_html):
-    return admin_html.replace(
+    html = admin_html.replace(
         '  <script src="admin.js"></script>\n</body>',
         cart_html.rstrip() + '\n\n  <script src="admin.js"></script>\n</body>'
+    )
+    # Asegurar que los botones del modal del carrito sean type="button" para evitar submit por defecto.
+    html = html.replace(
+        '        <button id="btn-cerrar-cart" class="nav-btn">Cerrar</button>\n'
+        '        <button id="btn-vaciar-cart" class="nav-btn">Vaciar</button>\n'
+        '        <button id="btn-liquidar-cart" class="nav-btn">Hacer liquidación</button>',
+        '        <button id="btn-cerrar-cart" class="nav-btn" type="button">Cerrar</button>\n'
+        '        <button id="btn-vaciar-cart" class="nav-btn" type="button">Vaciar</button>\n'
+        '        <button id="btn-liquidar-cart" class="nav-btn" type="button">Hacer liquidación</button>'
+    )
+    return html
+
+
+def patch_facturas_html(facturas_html):
+    return facturas_html.replace(
+        '        <button id="btn-cerrar-cart" class="nav-btn">Cerrar</button>\n'
+        '        <button id="btn-vaciar-cart" class="nav-btn">Vaciar</button>\n'
+        '        <button id="btn-liquidar-cart" class="nav-btn">Hacer liquidación</button>',
+        '        <button type="button" id="btn-cerrar-cart" class="nav-btn">Cerrar</button>\n'
+        '        <button type="button" id="btn-vaciar-cart" class="nav-btn">Vaciar</button>\n'
+        '        <button type="button" id="btn-liquidar-cart" class="nav-btn">Hacer liquidación</button>'
     )
 
 CART_HTML = '''  <button id="cart-fab" class="cart-fab hidden" title="Ver carrito">
@@ -114,14 +135,14 @@ CART_CSS = '''.cart-add-btn {
   background: rgba(var(--company-rgb), 0.95);
   border: 1px solid var(--company-text);
   color: #fff;
-  box-shadow: 0 0 24px var(--company-glow), 0 6px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
   z-index: 90;
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .cart-fab:hover {
   transform: scale(1.08);
-  box-shadow: 0 0 32px var(--company-glow), 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .cart-count {
@@ -167,7 +188,6 @@ CART_CSS = '''.cart-add-btn {
   color: var(--company-text);
   font-size: clamp(0.85rem, 2.6vw, 0.95rem);
   font-weight: 600;
-  text-shadow: 0 0 10px var(--company-glow);
   word-break: break-word;
 }
 
@@ -267,7 +287,18 @@ def patch_styles(css):
 .icon-disabled {'''
     if marker not in css:
         raise ValueError("Could not find .icon-link:hover -> .icon-disabled insertion point")
-    return css.replace(marker, replacement, 1)
+    css = css.replace(marker, replacement, 1)
+    # Normalizar glow remanente en selectores comunes: quitar sombras de neon de botones generales
+    # y reemplazar bordes/hover literales de megaworld por variables corporativas si faltan.
+    css = css.replace(
+        '  border: 1px solid rgba(241, 245, 249, 0.55);',
+        '  border: 1px solid var(--company-light);'
+    )
+    css = css.replace(
+        '  background: rgba(115, 130, 153, 0.95);',
+        '  background: var(--company-hover);'
+    )
+    return css
 
 def main():
     src_admin_js = read(os.path.join(SOURCE, "admin.js"))
