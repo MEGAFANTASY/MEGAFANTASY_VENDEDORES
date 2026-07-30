@@ -96,6 +96,51 @@
     </div>
   </div>
 
+  <button id="cart-fab" class="cart-fab hidden" title="Ver carrito">
+    🛒
+    <span id="cart-count" class="cart-count">0</span>
+  </button>
+
+  <div id="cart-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content cart-modal-content">
+      <h3>Liquidación</h3>
+      <div class="cart-detail-grid">
+        <div class="cart-label">Bodega:</div>
+        <div class="cart-value" id="cart-bodega">-</div>
+        <div class="cart-label">Vendedor:</div>
+        <div class="cart-value" id="cart-vendedor">-</div>
+        <div class="cart-label">Cliente:</div>
+        <div class="cart-value" id="cart-cliente">-</div>
+        <div class="cart-label">Ciudad:</div>
+        <div class="cart-value" id="cart-ciudad">-</div>
+        <div class="cart-label">Dirección:</div>
+        <div class="cart-value" id="cart-direccion">-</div>
+        <div class="cart-label">Fecha:</div>
+        <div class="cart-value cart-value-long" id="cart-fecha">-</div>
+        <div class="cart-label">Factura:</div>
+        <div class="cart-value cart-value-long" id="cart-factura">-</div>
+        <div class="cart-label">Total:</div>
+        <div class="cart-value cart-value-number" id="cart-total">$0</div>
+        <div class="cart-label">Flete:</div>
+        <div class="cart-value cart-value-number" id="cart-flete">$0</div>
+        <div class="cart-label">Abono:</div>
+        <div class="cart-value cart-value-number" id="cart-abono">$0</div>
+        <div class="cart-label">Saldo:</div>
+        <div class="cart-value cart-value-number" id="cart-saldo">$0</div>
+      </div>
+      <div class="cart-items">
+        <div class="cart-items-title">Facturas agregadas:</div>
+        <div id="cart-items-list" class="cart-items-list"></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="btn-cerrar-cart" class="nav-btn">Cerrar</button>
+        <button type="button" id="btn-vaciar-cart" class="nav-btn">Vaciar</button>
+        <button type="button" id="btn-liquidar-cart" class="nav-btn">Hacer liquidación</button>
+      </div>
+    </div>
+  </div>
+
   <script src="admin.js"></script>
 </body>
 </html>
