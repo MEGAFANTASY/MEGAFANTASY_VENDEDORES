@@ -11,6 +11,8 @@ const isAdmin = role === 'admin';
 let allFacturas = [];
 let currentStatus = 'todas';
 let currentSearch = '';
+let selectedCiudades = [];
+let editingVendedorId = null;
 
 function checkAuth() {
   if (localStorage.getItem(sessionKey) !== 'true') {
@@ -89,6 +91,13 @@ function applyFilters() {
     });
   }
 
+  if (selectedCiudades.length > 0) {
+    filtered = filtered.filter(row => {
+      const ciudad = (row.ciudad || '').toString().trim().toLowerCase();
+      return selectedCiudades.includes(ciudad);
+    });
+  }
+
   if (term) {
     filtered = filtered.filter(row => {
       const cliente = (row.cliente || '').toString().toLowerCase();
@@ -99,6 +108,83 @@ function applyFilters() {
   }
 
   renderCartera(filtered);
+}
+
+function populateCiudades() {
+  const panel = document.getElementById('ciudades-options');
+  if (!panel) return;
+
+  const ciudades = Array.from(new Set(
+    allFacturas
+      .map(row => (row.ciudad || '').toString().trim())
+      .filter(c => c)
+      .sort((a, b) => a.localeCompare(b))
+  ));
+
+  panel.innerHTML = ciudades.map(ciudad => {
+    const value = ciudad.toLowerCase();
+    const checked = selectedCiudades.includes(value) ? 'checked' : '';
+    return `
+      <label class="ciudad-option">
+        <input type="checkbox" value="${escapeHtml(value)}" ${checked} />
+        <span>${escapeHtml(ciudad)}</span>
+      </label>
+    `;
+  }).join('');
+
+  panel.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+    chk.addEventListener('change', () => {
+      selectedCiudades = Array.from(panel.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+      updateCiudadesTrigger();
+      applyFilters();
+    });
+  });
+
+  updateCiudadesTrigger();
+}
+
+function updateCiudadesTrigger() {
+  const trigger = document.getElementById('ciudades-trigger');
+  const limpiarBtn = document.getElementById('btn-limpiar-ciudades');
+  if (!trigger) return;
+  if (selectedCiudades.length === 0) {
+    trigger.textContent = 'Ciudades';
+    trigger.classList.remove('has-selection');
+    if (limpiarBtn) limpiarBtn.classList.add('hidden');
+  } else {
+    trigger.textContent = `${selectedCiudades.length} ciudad${selectedCiudades.length > 1 ? 'es' : ''}`;
+    trigger.classList.add('has-selection');
+    if (limpiarBtn) limpiarBtn.classList.remove('hidden');
+  }
+}
+
+function setupCiudadesFilter() {
+  const dropdown = document.getElementById('ciudades-dropdown');
+  const trigger = document.getElementById('ciudades-trigger');
+  const panel = document.getElementById('ciudades-panel');
+  const limpiarBtn = document.getElementById('btn-limpiar-ciudades');
+  if (!dropdown || !trigger || !panel) return;
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    panel.classList.toggle('hidden');
+  });
+
+  if (limpiarBtn) {
+    limpiarBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectedCiudades = [];
+      document.querySelectorAll('#ciudades-options input[type="checkbox"]').forEach(c => c.checked = false);
+      updateCiudadesTrigger();
+      applyFilters();
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target)) {
+      panel.classList.add('hidden');
+    }
+  });
 }
 
 async function loadCartera() {
@@ -121,6 +207,7 @@ async function loadCartera() {
     }
 
     allFacturas = data.facturas || [];
+    populateCiudades();
     applyFilters();
   } catch (err) {
     loading.textContent = 'Error de conexión';
@@ -147,6 +234,8 @@ function setupFilters() {
       applyFilters();
     });
   });
+
+  setupCiudadesFilter();
 }
 
 async function loadVendedores() {
@@ -176,11 +265,24 @@ async function loadVendedores() {
 
     empty.classList.add('hidden');
     cards.innerHTML = vendedores.map(v => `
-      <div class="vendedor-card">
+      <div class="vendedor-card" data-id="${escapeHtml(v.id)}">
         <div class="vendedor-nombre">${escapeHtml(v.vendedor)}</div>
         <div class="vendedor-usuario">Usuario: ${escapeHtml(v.usuario)}</div>
+        <div class="vendedor-contrasena">Contraseña: ${escapeHtml(v.contrasena)}</div>
+        <div class="vendedor-actions">
+          <button class="vendedor-btn edit" data-id="${escapeHtml(v.id)}" data-vendedor="${escapeHtml(v.vendedor)}" data-usuario="${escapeHtml(v.usuario)}" data-contrasena="${escapeHtml(v.contrasena)}">Editar</button>
+          <button class="vendedor-btn delete" data-id="${escapeHtml(v.id)}">Eliminar</button>
+        </div>
       </div>
     `).join('');
+
+    cards.querySelectorAll('.vendedor-btn.edit').forEach(btn => {
+      btn.addEventListener('click', () => openEditModal(btn.dataset));
+    });
+    cards.querySelectorAll('.vendedor-btn.delete').forEach(btn => {
+      btn.addEventListener('click', () => deleteVendedor(btn.dataset.id));
+    });
+
     cards.classList.remove('hidden');
   } catch (err) {
     loading.textContent = 'Error de conexión';
@@ -208,16 +310,37 @@ async function loadVendedoresDisponibles() {
 }
 
 function openModal() {
+  editingVendedorId = null;
+  document.getElementById('modal-titulo').textContent = 'Crear usuario vendedor';
+  document.getElementById('input-id').value = '';
   document.getElementById('modal-vendedor').classList.remove('hidden');
   document.getElementById('modal-error').textContent = '';
   document.getElementById('select-vendedor').value = '';
   document.getElementById('input-usuario').value = '';
   document.getElementById('input-contrasena').value = '';
+  document.getElementById('select-vendedor').disabled = false;
   loadVendedoresDisponibles();
+}
+
+function openEditModal(data) {
+  editingVendedorId = data.id;
+  document.getElementById('modal-titulo').textContent = 'Editar usuario vendedor';
+  document.getElementById('input-id').value = data.id;
+  document.getElementById('modal-vendedor').classList.remove('hidden');
+  document.getElementById('modal-error').textContent = '';
+
+  const select = document.getElementById('select-vendedor');
+  select.innerHTML = `<option value="${escapeHtml(data.vendedor)}" selected>${escapeHtml(data.vendedor)}</option>`;
+  select.value = data.vendedor;
+  select.disabled = true;
+
+  document.getElementById('input-usuario').value = data.usuario;
+  document.getElementById('input-contrasena').value = data.contrasena;
 }
 
 function closeModal() {
   document.getElementById('modal-vendedor').classList.add('hidden');
+  editingVendedorId = null;
 }
 
 async function saveVendedor() {
@@ -237,11 +360,20 @@ async function saveVendedor() {
   }
 
   try {
-    const response = await fetch('/api/vendedores', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bodega: company, vendedor, usuario, contrasena })
-    });
+    let response;
+    if (editingVendedorId) {
+      response = await fetch('/api/vendedores', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bodega: company, id: editingVendedorId, vendedor, usuario, contrasena })
+      });
+    } else {
+      response = await fetch('/api/vendedores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bodega: company, vendedor, usuario, contrasena })
+      });
+    }
     const result = await response.json();
 
     if (response.ok && result.ok) {
@@ -255,6 +387,23 @@ async function saveVendedor() {
   }
 }
 
+async function deleteVendedor(id) {
+  if (!confirm('¿Eliminar este usuario vendedor?')) return;
+  try {
+    const response = await fetch(`/api/vendedores?bodega=${company}&id=${encodeURIComponent(id)}`, {
+      method: 'DELETE'
+    });
+    const result = await response.json();
+    if (response.ok && result.ok) {
+      await loadVendedores();
+    } else {
+      alert(result.error || 'Error eliminando vendedor');
+    }
+  } catch (err) {
+    alert('Error de conexión');
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   checkAuth();
 
@@ -265,6 +414,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-cartera').addEventListener('click', () => showSection('cartera'));
   document.getElementById('btn-vendedores').addEventListener('click', () => showSection('vendedores'));
+  document.getElementById('btn-empresas').addEventListener('click', () => {
+    window.location.href = '/';
+  });
   document.getElementById('btn-logout').addEventListener('click', () => {
     localStorage.removeItem(sessionKey);
     localStorage.removeItem(usernameKey);

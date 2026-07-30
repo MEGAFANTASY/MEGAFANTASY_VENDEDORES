@@ -337,8 +337,16 @@ button:hover {
   display: flex;
   flex-wrap: wrap;
   gap: clamp(12px, 3vw, 18px);
-  align-items: center;
+  align-items: stretch;
   margin-bottom: clamp(18px, 4vw, 24px);
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(12px, 3vw, 18px);
+  align-items: center;
+  width: 100%;
 }
 
 #search-cartera,
@@ -357,6 +365,109 @@ button:hover {
 #search-cartera::placeholder,
 .search-input::placeholder {
   color: rgba(255, 255, 255, 0.4);
+}
+
+.ciudades-dropdown {
+  flex: 1 1 240px;
+  min-width: 200px;
+  position: relative;
+}
+
+.ciudades-trigger {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  padding: clamp(10px, 3vw, 14px) clamp(14px, 4vw, 18px);
+  font-size: clamp(0.85rem, 2.6vw, 0.95rem);
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ciudades-trigger::after {
+  content: '▼';
+  font-size: 0.7rem;
+  margin-left: 10px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ciudades-trigger.has-selection {
+  background: var(--company-color);
+  border-color: var(--company-color);
+  color: #fff;
+}
+
+.ciudades-trigger.has-selection::after {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ciudades-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  z-index: 50;
+  padding: 8px 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.limpiar-ciudades {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+  box-shadow: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.limpiar-ciudades:hover {
+  background: rgba(255, 107, 107, 0.2);
+  border-color: rgba(255, 107, 107, 0.4);
+  color: rgba(255, 107, 107, 0.95);
+  transform: none;
+  box-shadow: none;
+}
+
+.ciudades-options {
+  display: flex;
+  flex-direction: column;
+}
+
+.ciudad-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: clamp(0.85rem, 2.6vw, 0.95rem);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ciudad-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ciudad-option input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--company-color);
+  margin: 0;
+  flex-shrink: 0;
 }
 
 .status-filters {
@@ -402,8 +513,14 @@ button:hover {
     align-items: stretch;
   }
 
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   #search-cartera,
-  .search-input {
+  .search-input,
+  .multi-select {
     width: 100%;
     flex: none;
   }
@@ -546,6 +663,56 @@ button:hover {
 .vendedor-usuario {
   color: rgba(255, 255, 255, 0.75);
   font-size: clamp(0.8rem, 2.4vw, 0.9rem);
+  margin-bottom: 4px;
+}
+
+.vendedor-contrasena {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: clamp(0.75rem, 2.2vw, 0.85rem);
+  font-family: monospace;
+  margin-bottom: 12px;
+}
+
+.vendedor-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.vendedor-btn {
+  flex: 1;
+  padding: 8px 12px;
+  margin: 0;
+  font-size: clamp(0.7rem, 2vw, 0.8rem);
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vendedor-btn.edit {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: none;
+}
+
+.vendedor-btn.edit:hover {
+  background: var(--company-color);
+  border-color: var(--company-color);
+  color: #fff;
+  transform: none;
+}
+
+.vendedor-btn.delete {
+  background: rgba(255, 107, 107, 0.15);
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  color: rgba(255, 107, 107, 0.9);
+  box-shadow: none;
+}
+
+.vendedor-btn.delete:hover {
+  background: rgba(255, 107, 107, 0.3);
+  border-color: rgba(255, 107, 107, 0.6);
+  transform: none;
 }
 
 .add-vendedor-btn {

@@ -54,6 +54,27 @@ class SPAHandler(SimpleHTTPRequestHandler):
             return
         self.send_error(404)
 
+    def do_PUT(self):
+        if self.path == '/api/vendedores':
+            self.handle_update_vendedor()
+            return
+        self.send_error(404)
+
+    def do_DELETE(self):
+        if self.path.startswith('/api/vendedores'):
+            self.handle_delete_vendedor()
+            return
+        self.send_error(404)
+
+    def _read_json_body(self):
+        length = int(self.headers.get('Content-Length', 0))
+        body = self.rfile.read(length).decode('utf-8')
+        try:
+            return json.loads(body)
+        except json.JSONDecodeError:
+            self.send_json(400, {'error': 'JSON invalido'})
+            return None
+
     def handle_login(self):
         length = int(self.headers.get('Content-Length', 0))
         body = self.rfile.read(length).decode('utf-8')
@@ -144,7 +165,7 @@ class SPAHandler(SimpleHTTPRequestHandler):
         try:
             conn = sqlite3.connect(db_path)
             conn.row_factory = sqlite3.Row
-            cur = conn.execute('SELECT vendedor, usuario FROM vendedores ORDER BY vendedor')
+            cur = conn.execute('SELECT id, vendedor, usuario, contrasena FROM vendedores ORDER BY vendedor')
             rows = [dict(row) for row in cur.fetchall()]
             conn.close()
             self.send_json(200, {'bodega': bodega, 'vendedores': rows})
@@ -225,6 +246,67 @@ class SPAHandler(SimpleHTTPRequestHandler):
             self.send_json(200, {'ok': True, 'bodega': bodega})
         except sqlite3.IntegrityError:
             self.send_json(409, {'error': 'El usuario ya existe'})
+        except Exception as e:
+            self.send_json(500, {'error': str(e)})
+
+    def handle_update_vendedor(self):
+        data = self._read_json_body()
+        if data is None:
+            return
+        bodega = data.get('bodega', '').strip().lower()
+        vid = data.get('id')
+        vendedor = data.get('vendedor', '').strip()
+        usuario = data.get('usuario', '').strip()
+        contrasena = data.get('contrasena', '').strip()
+
+        if bodega not in BODEGAS:
+            self.send_json(400, {'error': 'Bodega no valida'})
+            return
+        if not vid or not vendedor or not usuario or not contrasena:
+            self.send_json(400, {'error': 'Completa todos los campos'})
+            return
+        if len(contrasena) < 4:
+            self.send_json(400, {'error': 'La contrasena debe tener minimo 4 caracteres'})
+            return
+
+        v_db_path = os.path.join(DATA_DIR, f'v_{bodega}.db')
+        try:
+            conn = sqlite3.connect(v_db_path)
+            existing = conn.execute('SELECT id FROM vendedores WHERE usuario = ? AND id != ?', (usuario, vid)).fetchone()
+            if existing:
+                conn.close()
+                self.send_json(409, {'error': 'El usuario ya existe'})
+                return
+            conn.execute(
+                'UPDATE vendedores SET vendedor = ?, usuario = ?, contrasena = ? WHERE id = ?',
+                (vendedor, usuario, contrasena, vid)
+            )
+            conn.commit()
+            conn.close()
+            self.send_json(200, {'ok': True, 'bodega': bodega})
+        except Exception as e:
+            self.send_json(500, {'error': str(e)})
+
+    def handle_delete_vendedor(self):
+        parsed = urllib.parse.urlparse(self.path)
+        params = urllib.parse.parse_qs(parsed.query)
+        bodega = params.get('bodega', [''])[0].strip().lower()
+        vid = params.get('id', [''])[0].strip()
+
+        if bodega not in BODEGAS:
+            self.send_json(400, {'error': 'Bodega no valida'})
+            return
+        if not vid:
+            self.send_json(400, {'error': 'ID requerido'})
+            return
+
+        v_db_path = os.path.join(DATA_DIR, f'v_{bodega}.db')
+        try:
+            conn = sqlite3.connect(v_db_path)
+            conn.execute('DELETE FROM vendedores WHERE id = ?', (vid,))
+            conn.commit()
+            conn.close()
+            self.send_json(200, {'ok': True, 'bodega': bodega})
         except Exception as e:
             self.send_json(500, {'error': str(e)})
 

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Admin NEXUS</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -12,6 +12,7 @@
     <div class="nav-actions">
       <button id="btn-cartera" class="nav-btn active">Cartera</button>
       <button id="btn-vendedores" class="nav-btn">Vendedores</button>
+      <button id="btn-empresas" class="nav-btn">Otras empresas</button>
       <button id="btn-logout" class="nav-btn logout">Cerrar sesión</button>
     </div>
   </nav>
@@ -23,8 +24,18 @@
         <div class="cartera-total">Total saldo: <span id="cartera-total-saldo">$0</span></div>
       </div>
       <div class="cartera-filters">
-        <input type="text" id="search-cartera" class="search-input" placeholder="Buscar por cliente, factura o ciudad..." />
-        <div class="status-filters">
+        <div class="filter-row">
+          <input type="text" id="search-cartera" class="search-input" placeholder="Buscar por cliente, factura o ciudad..." />
+        </div>
+        <div class="filter-row">
+          <div class="ciudades-dropdown" id="ciudades-dropdown">
+            <div class="ciudades-trigger" id="ciudades-trigger">Ciudades</div>
+            <button type="button" id="btn-limpiar-ciudades" class="limpiar-ciudades hidden">Limpiar ciudades</button>
+            <div class="ciudades-panel hidden" id="ciudades-panel">
+              <div class="ciudades-options" id="ciudades-options"></div>
+            </div>
+          </div>
+          <div class="status-filters">
           <button class="status-btn active" data-status="todas">Todas</button>
           <button class="status-btn" data-status="auditoria">Auditoria</button>
           <button class="status-btn" data-status="vencida">Vencida</button>
@@ -67,7 +78,8 @@
   <div id="modal-vendedor" class="modal hidden">
     <div class="modal-backdrop"></div>
     <div class="modal-content">
-      <h3>Crear usuario vendedor</h3>
+      <h3 id="modal-titulo">Crear usuario vendedor</h3>
+      <input type="hidden" id="input-id" value="" />
       <label for="select-vendedor">VENDEDOR</label>
       <select id="select-vendedor">
         <option value="">Selecciona un vendedor</option>
@@ -75,7 +87,7 @@
       <label for="input-usuario">USUARIO</label>
       <input type="text" id="input-usuario" placeholder="Ej: LAZARO" />
       <label for="input-contrasena">CONTRASEÑA</label>
-      <input type="password" id="input-contrasena" placeholder="Mínimo 4 caracteres" />
+      <input type="text" id="input-contrasena" placeholder="Mínimo 4 caracteres" />
       <div id="modal-error" class="error"></div>
       <div class="modal-actions">
         <button id="btn-cancelar-modal" class="nav-btn">Cancelar</button>
@@ -87,4 +99,3 @@
   <script src="admin.js"></script>
 </body>
 </html>
-
