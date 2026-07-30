@@ -45,6 +45,10 @@ function renderCartera(facturas) {
   const tableWrap = document.getElementById('cartera-table-wrap');
   const empty = document.getElementById('cartera-empty');
   const tbody = document.getElementById('cartera-body');
+  const totalEl = document.getElementById('cartera-total-saldo');
+
+  const total = facturas.reduce((sum, row) => sum + (parseFloat(row.saldo) || 0), 0);
+  if (totalEl) totalEl.textContent = formatCurrency(total);
 
   if (facturas.length === 0) {
     tableWrap.classList.add('hidden');

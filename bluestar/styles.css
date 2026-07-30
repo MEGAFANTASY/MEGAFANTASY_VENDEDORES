@@ -1,5 +1,5 @@
 :root {
-  --company-color: #2563eb;
+  --company-color: #dc2626;
 }
 
 * {
@@ -51,7 +51,7 @@ h1 {
   text-transform: uppercase;
   font-weight: 300;
   letter-spacing: clamp(1px, 0.4vw, 3px);
-  text-shadow: 0 0 18px rgba(37, 99, 235, 0.4);
+  text-shadow: 0 0 18px rgba(220, 38, 38, 0.4);
 }
 
 p {
@@ -210,9 +210,32 @@ button:hover {
   color: rgba(255, 255, 255, 0.9);
   font-size: clamp(1.2rem, 5vw, 1.6rem);
   font-weight: 300;
-  margin-bottom: clamp(16px, 4vw, 24px);
+  margin-bottom: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+.cartera-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: clamp(16px, 4vw, 24px);
+}
+
+.cartera-total {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: clamp(10px, 3vw, 14px) clamp(16px, 4vw, 20px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(0.9rem, 3vw, 1rem);
+  font-weight: 600;
+}
+
+.cartera-total span {
+  color: var(--company-color);
 }
 
 .loading,
