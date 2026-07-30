@@ -1,6 +1,11 @@
 :root {
   --company-color: #dc2626;
   --company-rgb: 220, 38, 38;
+  --company-text: #fca5a5;
+  --company-glow: rgba(252, 165, 165, 0.45);
+  --company-light: rgba(252, 165, 165, 0.55);
+  --company-focus: rgba(252, 165, 165, 0.25);
+  --company-hover: rgba(239, 68, 68, 0.95);
 }
 
 * {
@@ -47,12 +52,12 @@ body.admin-body {
 
 h1 {
   font-size: clamp(1.6rem, 6vw, 2rem);
-  color: var(--company-color);
+  color: var(--company-text);
   margin-bottom: 8px;
   text-transform: uppercase;
-  font-weight: 300;
+  font-weight: 500;
   letter-spacing: clamp(1px, 0.4vw, 3px);
-  text-shadow: 0 0 18px rgba(var(--company-rgb), 0.4);
+  text-shadow: 0 0 22px var(--company-glow);
 }
 
 p {
@@ -79,28 +84,29 @@ input::placeholder {
 input:focus {
   outline: none;
   border-color: var(--company-color);
-  box-shadow: 0 0 0 3px rgba(var(--company-rgb), 0.25);
+  box-shadow: 0 0 0 3px var(--company-focus);
 }
 
 button {
   width: 100%;
   padding: clamp(12px, 3.5vw, 16px);
   margin-top: 4px;
-  background: rgba(var(--company-rgb), 0.85);
+  background: rgba(var(--company-rgb), 0.9);
   color: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(var(--company-rgb), 0.5);
+  border: 1px solid var(--company-light);
   border-radius: 12px;
   font-size: clamp(0.85rem, 2.6vw, 0.95rem);
   font-weight: 500;
   letter-spacing: clamp(0.5px, 0.2vw, 2px);
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 0 16px rgba(var(--company-rgb), 0.25);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  box-shadow: 0 0 18px var(--company-glow);
 }
 
 button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 0 24px rgba(var(--company-rgb), 0.45);
+  background: var(--company-hover);
+  box-shadow: 0 0 26px var(--company-glow);
 }
 
 .back {
@@ -146,11 +152,12 @@ button:hover {
 
 .admin-nav .brand {
   font-size: clamp(1rem, 4vw, 1.3rem);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 1px;
-  color: var(--company-color);
+  color: var(--company-text);
   text-transform: uppercase;
   white-space: nowrap;
+  text-shadow: 0 0 14px var(--company-glow);
 }
 
 .admin-nav .nav-actions {
@@ -208,12 +215,13 @@ button:hover {
 }
 
 .admin-section h2 {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--company-text);
   font-size: clamp(1.2rem, 5vw, 1.6rem);
-  font-weight: 300;
+  font-weight: 500;
   margin-bottom: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
+  text-shadow: 0 0 14px var(--company-glow);
 }
 
 .cartera-header {
@@ -236,7 +244,8 @@ button:hover {
 }
 
 .cartera-total span {
-  color: var(--company-color);
+  color: var(--company-text);
+  text-shadow: 0 0 10px var(--company-glow);
 }
 
 .loading,
@@ -284,6 +293,7 @@ button:hover {
 .data-table thead {
   background: var(--company-color);
   color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 .data-table th,
@@ -503,9 +513,10 @@ button:hover {
 
 .status-btn.active {
   background: var(--company-color);
-  border-color: var(--company-color);
+  border-color: var(--company-text);
   color: #fff;
-  box-shadow: 0 0 16px rgba(var(--company-rgb), 0.3);
+  box-shadow: 0 0 18px var(--company-glow);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 720px) {
@@ -556,6 +567,7 @@ button:hover {
 
 .icon-link:hover {
   background: var(--company-color);
+  color: var(--company-text);
   transform: scale(1.1);
 }
 
@@ -654,11 +666,12 @@ button:hover {
 }
 
 .vendedor-nombre {
-  font-weight: 600;
-  color: var(--company-color);
+  font-weight: 700;
+  color: var(--company-text);
   margin-bottom: 6px;
   text-transform: uppercase;
   font-size: clamp(0.85rem, 2.6vw, 0.95rem);
+  text-shadow: 0 0 10px var(--company-glow);
 }
 
 .vendedor-usuario {
@@ -698,8 +711,8 @@ button:hover {
 
 .vendedor-btn.edit:hover {
   background: var(--company-color);
-  border-color: var(--company-color);
-  color: #fff;
+  border-color: var(--company-text);
+  color: var(--company-text);
   transform: none;
 }
 
@@ -755,11 +768,12 @@ button:hover {
 }
 
 .modal-content h3 {
-  color: var(--company-color);
+  color: var(--company-text);
   margin-bottom: clamp(18px, 4vw, 24px);
   text-transform: uppercase;
-  font-weight: 300;
+  font-weight: 500;
   letter-spacing: 1px;
+  text-shadow: 0 0 14px var(--company-glow);
 }
 
 .modal-content label {
@@ -803,12 +817,14 @@ button:hover {
 
 .modal-actions .nav-btn:last-child {
   background: var(--company-color);
-  border-color: var(--company-color);
+  border-color: var(--company-text);
   color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .modal-actions .nav-btn:last-child:hover {
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 20px var(--company-glow);
+  background: var(--company-hover);
 }
 
 #modal-error {
