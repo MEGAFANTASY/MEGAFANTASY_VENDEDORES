@@ -1,5 +1,6 @@
 :root {
   --company-color: #dc2626;
+  --company-rgb: 220, 38, 38;
 }
 
 * {
@@ -51,7 +52,7 @@ h1 {
   text-transform: uppercase;
   font-weight: 300;
   letter-spacing: clamp(1px, 0.4vw, 3px);
-  text-shadow: 0 0 18px rgba(220, 38, 38, 0.4);
+  text-shadow: 0 0 18px rgba(var(--company-rgb), 0.4);
 }
 
 p {
@@ -78,28 +79,28 @@ input::placeholder {
 input:focus {
   outline: none;
   border-color: var(--company-color);
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25);
+  box-shadow: 0 0 0 3px rgba(var(--company-rgb), 0.25);
 }
 
 button {
   width: 100%;
   padding: clamp(12px, 3.5vw, 16px);
   margin-top: 4px;
-  background: rgba(220, 38, 38, 0.85);
+  background: rgba(var(--company-rgb), 0.85);
   color: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(220, 38, 38, 0.5);
+  border: 1px solid rgba(var(--company-rgb), 0.5);
   border-radius: 12px;
   font-size: clamp(0.85rem, 2.6vw, 0.95rem);
   font-weight: 500;
   letter-spacing: clamp(0.5px, 0.2vw, 2px);
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 0 16px rgba(220, 38, 38, 0.25);
+  box-shadow: 0 0 16px rgba(var(--company-rgb), 0.25);
 }
 
 button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 0 24px rgba(220, 38, 38, 0.45);
+  box-shadow: 0 0 24px rgba(var(--company-rgb), 0.45);
 }
 
 .back {
@@ -504,7 +505,7 @@ button:hover {
   background: var(--company-color);
   border-color: var(--company-color);
   color: #fff;
-  box-shadow: 0 0 16px rgba(220, 38, 38, 0.3);
+  box-shadow: 0 0 16px rgba(var(--company-rgb), 0.3);
 }
 
 @media (max-width: 720px) {

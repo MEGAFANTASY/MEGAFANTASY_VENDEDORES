@@ -6,7 +6,7 @@ services:
       - "9002:8000"
     environment:
       - SHEETS_URL=https://script.google.com/macros/s/AKfycby9cTlYMta4df8jM0QktvLQRZDDn2bOD7RyoumxZyaGb9qCVXMQ0rHMqNUDQ75paropbA/exec
-      - SYNC_INTERVAL=300
+      - SYNC_INTERVAL=120
     volumes:
       - ./data:/data
     restart: unless-stopped
