@@ -6,6 +6,7 @@
 
 html {
   font-size: clamp(14px, 2vw, 18px);
+  background: #0f172a;
 }
 
 body {

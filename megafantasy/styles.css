@@ -16,6 +16,7 @@
 
 html {
   font-size: clamp(14px, 2vw, 18px);
+  background: #0f172a;
 }
 
 body {
@@ -187,7 +188,7 @@ button:hover {
   align-items: center;
   justify-content: space-between;
   gap: clamp(8px, 2vw, 16px);
-  padding: clamp(10px, 3vw, 14px) clamp(12px, 4vw, 24px);
+  padding: calc(clamp(10px, 3vw, 14px) + env(safe-area-inset-top)) clamp(12px, 4vw, 24px) clamp(10px, 3vw, 14px);
   background: rgba(15, 23, 42, 0.85);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(18px);
@@ -816,7 +817,7 @@ button:hover {
   }
 
   .admin-main {
-    padding-top: clamp(148px, 38vw, 180px);
+    padding-top: calc(env(safe-area-inset-top) + clamp(148px, 38vw, 180px));
   }
 
   .cartera-header {
