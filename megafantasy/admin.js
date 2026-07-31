@@ -421,6 +421,12 @@ function setupFilters() {
       currentSearch = e.target.value;
       applyFilters();
     });
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        searchInput.blur();
+      }
+    });
   }
 
   statusButtons.forEach(btn => {
@@ -503,6 +509,12 @@ function setupManifiestosFilter() {
   input.addEventListener('input', (e) => {
     manifiestoSearch = e.target.value;
     debouncedLoadManifiestos();
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      input.blur();
+    }
   });
 }
 

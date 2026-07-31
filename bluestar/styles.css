@@ -418,6 +418,44 @@ button:hover {
   font-size: clamp(0.85rem, 2.6vw, 0.95rem);
 }
 
+#search-manifiestos {
+  width: 100%;
+  flex: none;
+  margin-bottom: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+#section-manifiestos .filter-row {
+  position: sticky;
+  top: calc(clamp(80px, 18vw, 110px) - clamp(24px, 5vw, 40px) + 12px);
+  z-index: 70;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: clamp(10px, 3vw, 14px) clamp(14px, 4vw, 18px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  margin-bottom: clamp(18px, 4vw, 24px);
+}
+
+#section-manifiestos .cartera-header {
+  margin-bottom: clamp(18px, 4vw, 24px);
+}
+
+#section-manifiestos .table-wrap {
+  margin-top: clamp(12px, 3vw, 18px);
+}
+
+@media (max-width: 720px) {
+  #section-manifiestos .filter-row {
+    top: calc(clamp(80px, 18vw, 110px) - clamp(16px, 4vw, 24px) + 10px);
+  }
+}
+
 #search-cartera::placeholder,
 .search-input::placeholder {
   color: rgba(255, 255, 255, 0.4);
@@ -474,6 +512,32 @@ button:hover {
   z-index: 50;
   padding: 8px 0;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 720px) {
+  .ciudades-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    width: min(340px, 92vw);
+    max-height: min(420px, 70vh);
+    transform: translate(-50%, -50%);
+    border-radius: 16px;
+    z-index: 200;
+    padding: 12px 0;
+  }
+
+  .ciudades-panel::before {
+    content: '';
+    position: fixed;
+    top: -200vh;
+    left: -200vw;
+    right: -200vw;
+    bottom: -200vh;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: -1;
+  }
 }
 
 .limpiar-ciudades {
