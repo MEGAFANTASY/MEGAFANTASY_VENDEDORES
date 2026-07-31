@@ -33,6 +33,15 @@ CREATE TABLE IF NOT EXISTS vendedores (
 );
 '''
 
+CREATE_MANIFIESTOS_SQL = '''
+CREATE TABLE IF NOT EXISTS manifiestos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    referencia TEXT,
+    descripcion TEXT,
+    url_manifiesto TEXT
+);
+'''
+
 def init():
     os.makedirs(DATA_DIR, exist_ok=True)
     for bodega in BODEGAS:
@@ -49,6 +58,15 @@ def init():
         v_conn.commit()
         v_conn.close()
         print(f'Base de datos de vendedores lista: {v_db_path}')
+
+        m_db_path = os.path.join(DATA_DIR, f'{bodega}-manifiestos.db')
+        m_conn = sqlite3.connect(m_db_path)
+        m_conn.execute(CREATE_MANIFIESTOS_SQL)
+        m_conn.execute('CREATE INDEX IF NOT EXISTS idx_manifiestos_referencia ON manifiestos(referencia)')
+        m_conn.execute('CREATE INDEX IF NOT EXISTS idx_manifiestos_descripcion ON manifiestos(descripcion)')
+        m_conn.commit()
+        m_conn.close()
+        print(f'Base de datos de manifiestos lista: {m_db_path}')
 
 if __name__ == '__main__':
     init()

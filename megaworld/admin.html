@@ -13,6 +13,7 @@
     <div class="nav-actions">
       <button id="btn-cartera" class="nav-btn active">Cartera</button>
       <button id="btn-vendedores" class="nav-btn">Vendedores</button>
+      <button id="btn-manifiestos" class="nav-btn">Manifiestos</button>
       <button id="btn-empresas" class="nav-btn">Otras empresas</button>
       <button id="btn-logout" class="nav-btn logout">Cerrar sesión</button>
     </div>
@@ -73,6 +74,29 @@
         <div id="vendedores-cards" class="vendedores-cards hidden"></div>
       </div>
       <button id="btn-add-vendedor" class="add-vendedor-btn">Agregar vendedor</button>
+    </section>
+
+    <section id="section-manifiestos" class="admin-section">
+      <div class="cartera-header">
+        <h2>Manifiestos de importación</h2>
+      </div>
+      <div class="filter-row">
+        <input type="text" id="search-manifiestos" class="search-input" placeholder="Buscar por referencia o descripción..." />
+      </div>
+      <div id="manifiestos-loading" class="loading">Cargando manifiestos...</div>
+      <div id="manifiestos-table-wrap" class="table-wrap hidden">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Referencia</th>
+              <th>Descripción</th>
+              <th>Manifiesto</th>
+            </tr>
+          </thead>
+          <tbody id="manifiestos-body"></tbody>
+        </table>
+      </div>
+      <div id="manifiestos-empty" class="empty hidden">No hay manifiestos registrados.</div>
     </section>
   </main>
 

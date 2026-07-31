@@ -12,6 +12,8 @@ SYNC_INTERVAL = int(os.environ.get('SYNC_INTERVAL', '300'))
 
 COLUMNS = ['fecha', 'vendedor', 'cliente', 'direccion', 'ciudad', 'factura', 'total', 'saldo', 'dias', 'estatus', 'flete', 'url_factura', 'url_guia']
 
+MANIFIESTOS_COLUMNS = ['referencia', 'descripcion', 'url_manifiesto']
+
 def fetch_data(bodega):
     if not SHEETS_URL:
         print('Error: SHEETS_URL no configurada')
@@ -64,11 +66,38 @@ def update_database(bodega, rows):
     conn.close()
     print(f'{bodega}: {len(rows)} facturas actualizadas')
 
+def update_manifiestos(bodega, rows):
+    db_path = os.path.join(DATA_DIR, f'{bodega}-manifiestos.db')
+    os.makedirs(DATA_DIR, exist_ok=True)
+    conn = sqlite3.connect(db_path)
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS manifiestos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            referencia TEXT,
+            descripcion TEXT,
+            url_manifiesto TEXT
+        )
+    ''')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_manifiestos_referencia ON manifiestos(referencia)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_manifiestos_descripcion ON manifiestos(descripcion)')
+    conn.execute('DELETE FROM manifiestos')
+    for row in rows:
+        values = [row.get(col, '') for col in MANIFIESTOS_COLUMNS]
+        conn.execute('''
+            INSERT INTO manifiestos (referencia, descripcion, url_manifiesto)
+            VALUES (?, ?, ?)
+        ''', values)
+    conn.commit()
+    conn.close()
+    print(f'{bodega}: {len(rows)} manifiestos actualizados')
+
 def sync_once():
     print('Iniciando sincronizacion...')
     for bodega in BODEGAS:
         rows = fetch_data(bodega)
         update_database(bodega, rows)
+        m_rows = fetch_data(f'{bodega}-manifiestos')
+        update_manifiestos(bodega, m_rows)
     print('Sincronizacion completada.')
 
 def main():

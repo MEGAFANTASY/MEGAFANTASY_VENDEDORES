@@ -14,6 +14,8 @@ let currentSearch = '';
 let selectedCiudades = [];
 let editingVendedorId = null;
 const cartKey = `carrito_${company}`;
+let manifiestoSearch = '';
+let manifiestosAbort = null;
 
 function checkAuth() {
   if (localStorage.getItem(sessionKey) !== 'true') {
@@ -70,6 +72,14 @@ function showSection(name) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`section-${name}`).classList.add('active');
   document.getElementById(`btn-${name}`).classList.add('active');
+}
+
+function debounce(fn, ms) {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), ms);
+  };
 }
 
 function getCart() {
@@ -425,6 +435,77 @@ function setupFilters() {
   setupCiudadesFilter();
 }
 
+async function loadManifiestos() {
+  const loading = document.getElementById('manifiestos-loading');
+  const term = encodeURIComponent(manifiestoSearch);
+
+  if (manifiestosAbort) manifiestosAbort.abort();
+  manifiestosAbort = new AbortController();
+
+  try {
+    if (loading) loading.classList.remove('hidden');
+    const response = await fetch(`/api/manifiestos?bodega=${company}&q=${term}`, {
+      signal: manifiestosAbort.signal
+    });
+    const data = await response.json();
+    if (loading) loading.classList.add('hidden');
+
+    if (!response.ok || data.error) {
+      if (loading) {
+        loading.textContent = data.error || 'Error cargando manifiestos';
+        loading.classList.remove('hidden');
+      }
+      return;
+    }
+
+    renderManifiestos(data.manifiestos || []);
+  } catch (err) {
+    if (err.name === 'AbortError') return;
+    if (loading) {
+      loading.textContent = 'Error de conexión';
+      loading.classList.remove('hidden');
+    }
+  }
+}
+
+const debouncedLoadManifiestos = debounce(loadManifiestos, 350);
+
+function renderManifiestos(list) {
+  const wrap = document.getElementById('manifiestos-table-wrap');
+  const empty = document.getElementById('manifiestos-empty');
+  const tbody = document.getElementById('manifiestos-body');
+
+  if (!wrap || !empty || !tbody) return;
+
+  if (list.length === 0) {
+    wrap.classList.add('hidden');
+    empty.classList.remove('hidden');
+    return;
+  }
+
+  empty.classList.add('hidden');
+  tbody.innerHTML = list.map(m => `
+    <tr>
+      <td data-label="Referencia">${escapeHtml(m.referencia || '')}</td>
+      <td data-label="Descripción">${escapeHtml(m.descripcion || '')}</td>
+      <td data-label="Manifiesto" class="actions">
+        ${m.url_manifiesto ? `<a href="${escapeHtml(m.url_manifiesto)}" target="_blank" rel="noopener" class="icon-link" title="Ver manifiesto">📄</a>` : '<span class="icon-disabled">📄</span>'}
+      </td>
+    </tr>
+  `).join('');
+
+  wrap.classList.remove('hidden');
+}
+
+function setupManifiestosFilter() {
+  const input = document.getElementById('search-manifiestos');
+  if (!input) return;
+  input.addEventListener('input', (e) => {
+    manifiestoSearch = e.target.value;
+    debouncedLoadManifiestos();
+  });
+}
+
 async function loadVendedores() {
   const loading = document.getElementById('vendedores-loading');
   const empty = document.getElementById('vendedores-empty');
@@ -601,6 +682,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-cartera').addEventListener('click', () => showSection('cartera'));
   document.getElementById('btn-vendedores').addEventListener('click', () => showSection('vendedores'));
+  document.getElementById('btn-manifiestos').addEventListener('click', () => showSection('manifiestos'));
   document.getElementById('btn-empresas').addEventListener('click', () => {
     window.location.href = '/';
   });
@@ -615,6 +697,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loadCartera();
   setupFilters();
+  loadManifiestos();
+  setupManifiestosFilter();
   updateCartButton();
 
   const cartFab = document.getElementById('cart-fab');

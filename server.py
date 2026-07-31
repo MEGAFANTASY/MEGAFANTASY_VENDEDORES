@@ -37,6 +37,11 @@ class SPAHandler(SimpleHTTPRequestHandler):
             self.handle_list_vendedores()
             return
 
+        # API: obtener manifiestos de importacion de una bodega
+        if self.path.startswith('/api/manifiestos'):
+            self.handle_manifiestos()
+            return
+
         return super().do_GET()
 
     def end_headers(self):
@@ -200,6 +205,45 @@ class SPAHandler(SimpleHTTPRequestHandler):
 
             disponibles = sorted(factura_vendedores - creados)
             self.send_json(200, {'bodega': bodega, 'vendedores': disponibles})
+        except Exception as e:
+            self.send_json(500, {'error': str(e)})
+
+    def handle_manifiestos(self):
+        parsed = urllib.parse.urlparse(self.path)
+        params = urllib.parse.parse_qs(parsed.query)
+        bodega = params.get('bodega', [''])[0].strip().lower()
+        q = params.get('q', [''])[0].strip()
+
+        if bodega not in BODEGAS:
+            self.send_json(400, {'error': 'Bodega no valida'})
+            return
+
+        db_path = os.path.join(DATA_DIR, f'{bodega}-manifiestos.db')
+        if not os.path.exists(db_path):
+            self.send_json(500, {'error': 'Base de datos de manifiestos no encontrada'})
+            return
+
+        try:
+            conn = sqlite3.connect(db_path)
+            conn.row_factory = sqlite3.Row
+            if q:
+                cur = conn.execute('''
+                    SELECT id, referencia, descripcion, url_manifiesto
+                    FROM manifiestos
+                    WHERE referencia LIKE ? OR descripcion LIKE ?
+                    ORDER BY referencia
+                    LIMIT 100
+                ''', (f'%{q}%', f'%{q}%'))
+            else:
+                cur = conn.execute('''
+                    SELECT id, referencia, descripcion, url_manifiesto
+                    FROM manifiestos
+                    ORDER BY referencia
+                    LIMIT 100
+                ''')
+            rows = [dict(row) for row in cur.fetchall()]
+            conn.close()
+            self.send_json(200, {'bodega': bodega, 'manifiestos': rows})
         except Exception as e:
             self.send_json(500, {'error': str(e)})
 
