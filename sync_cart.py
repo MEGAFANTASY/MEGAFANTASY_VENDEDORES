@@ -28,32 +28,18 @@ def build_facturas_html(source_html, target):
     html = html.replace("<h1>MEGAFANTASY</h1>", f"<h1>{target.upper()}</h1>")
     return html
 
-def patch_admin_html(admin_html, cart_html):
-    html = admin_html.replace(
-        '  <script src="admin.js"></script>\n</body>',
-        cart_html.rstrip() + '\n\n  <script src="admin.js"></script>\n</body>'
-    )
-    # Asegurar que los botones del modal del carrito sean type="button" para evitar submit por defecto.
-    html = html.replace(
-        '        <button id="btn-cerrar-cart" class="nav-btn">Cerrar</button>\n'
-        '        <button id="btn-vaciar-cart" class="nav-btn">Vaciar</button>\n'
-        '        <button id="btn-liquidar-cart" class="nav-btn">Hacer liquidación</button>',
-        '        <button id="btn-cerrar-cart" class="nav-btn" type="button">Cerrar</button>\n'
-        '        <button id="btn-vaciar-cart" class="nav-btn" type="button">Vaciar</button>\n'
-        '        <button id="btn-liquidar-cart" class="nav-btn" type="button">Hacer liquidación</button>'
-    )
+def build_admin_html(source_html, target):
+    html = source_html.replace("Admin MEGAFANTASY", f"Admin {target.upper()}")
+    html = html.replace(">MEGAFANTASY<", f">{target.upper()}<")
     return html
 
-
-def patch_facturas_html(facturas_html):
-    return facturas_html.replace(
-        '        <button id="btn-cerrar-cart" class="nav-btn">Cerrar</button>\n'
-        '        <button id="btn-vaciar-cart" class="nav-btn">Vaciar</button>\n'
-        '        <button id="btn-liquidar-cart" class="nav-btn">Hacer liquidación</button>',
-        '        <button type="button" id="btn-cerrar-cart" class="nav-btn">Cerrar</button>\n'
-        '        <button type="button" id="btn-vaciar-cart" class="nav-btn">Vaciar</button>\n'
-        '        <button type="button" id="btn-liquidar-cart" class="nav-btn">Hacer liquidación</button>'
-    )
+def patch_styles_root(source_css, target_css):
+    """Copy source CSS (from megafantasy) but preserve target's :root color variables."""
+    target_root = re.search(r':root\s*\{[^}]*\}', target_css)
+    if not target_root:
+        raise ValueError("Could not find :root in target styles.css")
+    source_css = re.sub(r':root\s*\{[^}]*\}', target_root.group(0), source_css, count=1)
+    return source_css
 
 CART_HTML = '''  <button id="cart-fab" class="cart-fab hidden" title="Ver carrito">
     🛒
@@ -302,8 +288,10 @@ def patch_styles(css):
 
 def main():
     src_admin_js = read(os.path.join(SOURCE, "admin.js"))
+    src_admin_html = read(os.path.join(SOURCE, "admin.html"))
     src_facturas_js = read(os.path.join(SOURCE, "facturas.js"))
     src_facturas_html = read(os.path.join(SOURCE, "facturas.html"))
+    src_styles_css = read(os.path.join(SOURCE, "styles.css"))
 
     for target in TARGETS:
         folder = os.path.join(ROOT, target)
@@ -318,11 +306,12 @@ def main():
         # 3. facturas.html
         write(os.path.join(folder, "facturas.html"), build_facturas_html(src_facturas_html, target))
 
-        # 4. admin.html
-        write(os.path.join(folder, "admin.html"), patch_admin_html(read(os.path.join(folder, "admin.html")), CART_HTML))
+        # 4. admin.html (copy from source, patch title)
+        write(os.path.join(folder, "admin.html"), build_admin_html(src_admin_html, target))
 
-        # 5. styles.css
-        write(os.path.join(folder, "styles.css"), patch_styles(read(os.path.join(folder, "styles.css"))))
+        # 5. styles.css (copy from source, preserve target :root colors)
+        target_css = read(os.path.join(folder, "styles.css"))
+        write(os.path.join(folder, "styles.css"), patch_styles_root(src_styles_css, target_css))
 
     print("Done.")
 

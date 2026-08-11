@@ -26,6 +26,59 @@ function doGet(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+// doPost: escribir confirmacion de transportadora en la hoja
+// Recibe JSON: { hoja, factura, valor }
+// Busca la fila por FACTURA y escribe valor en CONFIRMADO APP VENDEDOR
+function doPost(e) {
+  var data = JSON.parse(e.postData.contents);
+  var hoja = data.hoja;
+  var factura = data.factura;
+  var valor = data.valor;
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(hoja);
+
+  if (!sheet) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ error: 'Hoja no encontrada: ' + hoja }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ error: 'Sin datos' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]
+    .map(function(h) { return String(h).toLowerCase().trim().replace(/ /g, '_'); });
+
+  var facturaCol = headers.indexOf('factura');
+  var confirmadoCol = headers.indexOf('confirmado_app_vendedor');
+
+  if (facturaCol === -1 || confirmadoCol === -1) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ error: 'Columnas no encontradas' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  var dataRange = sheet.getRange(2, facturaCol + 1, lastRow - 1, 1).getValues();
+
+  for (var i = 0; i < dataRange.length; i++) {
+    if (String(dataRange[i][0]).trim() === String(factura).trim()) {
+      sheet.getRange(i + 2, confirmadoCol + 1).setValue(valor);
+      return ContentService
+        .createTextOutput(JSON.stringify({ ok: true, fila: i + 2 }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ error: 'Factura no encontrada: ' + factura }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 // Publicar como Web App:
 // 1. Abrir Google Sheets
 // 2. Extensiones > Apps Script
@@ -37,3 +90,6 @@ function doGet(e) {
 // 8. Acceso: Cualquiera
 // 9. Copiar la URL generada
 // 10. Pegarla en docker-compose.yml en SHEETS_URL=
+// IMPORTANTE: Al actualizar este codigo, hay que crear una nueva version
+// de la implementacion existente (Implementar > Administrar implementaciones
+// > Editar > Nueva version > Implementar) para mantener la misma URL.

@@ -42,6 +42,20 @@ CREATE TABLE IF NOT EXISTS manifiestos (
 );
 '''
 
+CREATE_TRANSPORTADORAS_SQL = '''
+CREATE TABLE IF NOT EXISTS transportadoras (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    factura TEXT UNIQUE,
+    fechadespacho TEXT,
+    cliente TEXT,
+    direccion TEXT,
+    ciudad TEXT,
+    vendedor TEXT,
+    confirmado TEXT,
+    confirmado_app_vendedor TEXT
+);
+'''
+
 def init():
     os.makedirs(DATA_DIR, exist_ok=True)
     for bodega in BODEGAS:
@@ -67,6 +81,15 @@ def init():
         m_conn.commit()
         m_conn.close()
         print(f'Base de datos de manifiestos lista: {m_db_path}')
+
+        t_db_path = os.path.join(DATA_DIR, f'{bodega}-transportadoras.db')
+        t_conn = sqlite3.connect(t_db_path)
+        t_conn.execute(CREATE_TRANSPORTADORAS_SQL)
+        t_conn.execute('CREATE INDEX IF NOT EXISTS idx_transportadoras_factura ON transportadoras(factura)')
+        t_conn.execute('CREATE INDEX IF NOT EXISTS idx_transportadoras_vendedor ON transportadoras(vendedor)')
+        t_conn.commit()
+        t_conn.close()
+        print(f'Base de datos de transportadoras lista: {t_db_path}')
 
 if __name__ == '__main__':
     init()

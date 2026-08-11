@@ -14,6 +14,9 @@ COLUMNS = ['fecha', 'vendedor', 'cliente', 'direccion', 'ciudad', 'factura', 'to
 
 MANIFIESTOS_COLUMNS = ['referencia', 'descripcion', 'url_manifiesto']
 
+TRANSPORTADORAS_COLUMNS = ['factura', 'fechadespacho', 'cliente', 'direccion',
+                           'ciudad', 'vendedor', 'confirmado', 'confirmado_app_vendedor']
+
 def fetch_data(bodega):
     if not SHEETS_URL:
         print('Error: SHEETS_URL no configurada')
@@ -27,7 +30,11 @@ def fetch_data(bodega):
                 text = text[11:].strip()
             if text.startswith(')'):
                 text = text[1:].strip()
-            return json.loads(text)
+            data = json.loads(text)
+            if isinstance(data, dict):
+                print(f'Error en hoja {bodega}: {data.get("error", "respuesta inesperada")}')
+                return []
+            return data
     except Exception as e:
         print(f'Error descargando {bodega}: {e}')
         return []
@@ -91,6 +98,37 @@ def update_manifiestos(bodega, rows):
     conn.close()
     print(f'{bodega}: {len(rows)} manifiestos actualizados')
 
+def update_transportadoras(bodega, rows):
+    db_path = os.path.join(DATA_DIR, f'{bodega}-transportadoras.db')
+    os.makedirs(DATA_DIR, exist_ok=True)
+    conn = sqlite3.connect(db_path)
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS transportadoras (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            factura TEXT UNIQUE,
+            fechadespacho TEXT,
+            cliente TEXT,
+            direccion TEXT,
+            ciudad TEXT,
+            vendedor TEXT,
+            confirmado TEXT,
+            confirmado_app_vendedor TEXT
+        )
+    ''')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_transportadoras_factura ON transportadoras(factura)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_transportadoras_vendedor ON transportadoras(vendedor)')
+    conn.execute('DELETE FROM transportadoras')
+    for row in rows:
+        values = [row.get(col, '') for col in TRANSPORTADORAS_COLUMNS]
+        conn.execute('''
+            INSERT OR REPLACE INTO transportadoras
+            (factura, fechadespacho, cliente, direccion, ciudad, vendedor, confirmado, confirmado_app_vendedor)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', values)
+    conn.commit()
+    conn.close()
+    print(f'{bodega}: {len(rows)} transportadoras actualizadas')
+
 def sync_once():
     print('Iniciando sincronizacion...')
     for bodega in BODEGAS:
@@ -98,6 +136,8 @@ def sync_once():
         update_database(bodega, rows)
         m_rows = fetch_data(f'{bodega}-manifiestos')
         update_manifiestos(bodega, m_rows)
+        t_rows = fetch_data(f'{bodega}-transportadoras')
+        update_transportadoras(bodega, t_rows)
     print('Sincronizacion completada.')
 
 def main():

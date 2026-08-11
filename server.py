@@ -4,6 +4,7 @@ import os
 import json
 import sqlite3
 import urllib.parse
+import urllib.request
 
 DATA_DIR = '/data'
 BODEGAS = ['megafantasy', 'bluestar', 'nexus', 'megaworld', 'elitech']
@@ -42,6 +43,11 @@ class SPAHandler(SimpleHTTPRequestHandler):
             self.handle_manifiestos()
             return
 
+        # API: listar transportadoras de una bodega
+        if self.path.startswith('/api/transportadoras'):
+            self.handle_transportadoras()
+            return
+
         return super().do_GET()
 
     def end_headers(self):
@@ -56,6 +62,9 @@ class SPAHandler(SimpleHTTPRequestHandler):
             return
         if self.path == '/api/vendedores':
             self.handle_create_vendedor()
+            return
+        if self.path == '/api/confirmar-transportadora':
+            self.handle_confirmar_transportadora()
             return
         self.send_error(404)
 
@@ -246,6 +255,132 @@ class SPAHandler(SimpleHTTPRequestHandler):
             self.send_json(200, {'bodega': bodega, 'manifiestos': rows})
         except Exception as e:
             self.send_json(500, {'error': str(e)})
+
+    def handle_transportadoras(self):
+        parsed = urllib.parse.urlparse(self.path)
+        params = urllib.parse.parse_qs(parsed.query)
+        bodega = params.get('bodega', [''])[0].strip().lower()
+        vendedor = params.get('vendedor', [''])[0].strip()
+
+        if bodega not in BODEGAS:
+            self.send_json(400, {'error': 'Bodega no valida'})
+            return
+
+        db_path = os.path.join(DATA_DIR, f'{bodega}-transportadoras.db')
+        if not os.path.exists(db_path):
+            self.send_json(200, {'bodega': bodega, 'transportadoras': []})
+            return
+
+        try:
+            conn = sqlite3.connect(db_path)
+            conn.row_factory = sqlite3.Row
+            query = '''SELECT factura, fechadespacho, cliente, direccion, ciudad,
+                              vendedor, confirmado, confirmado_app_vendedor
+                       FROM transportadoras'''
+            args = []
+            if vendedor:
+                query += ' WHERE vendedor = ?'
+                args.append(vendedor)
+            query += ' ORDER BY fechadespacho DESC'
+            cur = conn.execute(query, args)
+            rows = [dict(row) for row in cur.fetchall()]
+            conn.close()
+            self.send_json(200, {'bodega': bodega, 'transportadoras': rows})
+        except Exception as e:
+            self.send_json(500, {'error': str(e)})
+
+    def handle_confirmar_transportadora(self):
+        data = self._read_json_body()
+        if data is None:
+            return
+
+        bodega = data.get('bodega', '').strip().lower()
+        factura = data.get('factura', '').strip()
+        vendedor = data.get('vendedor', '').strip()
+
+        if bodega not in BODEGAS:
+            self.send_json(400, {'error': 'Bodega no valida'})
+            return
+        if not factura:
+            self.send_json(400, {'error': 'Factura requerida'})
+            return
+
+        db_path = os.path.join(DATA_DIR, f'{bodega}-transportadoras.db')
+        if not os.path.exists(db_path):
+            self.send_json(500, {'error': 'Base de datos no encontrada'})
+            return
+
+        # Validar que la factura existe y pertenece al vendedor
+        try:
+            conn = sqlite3.connect(db_path)
+            conn.row_factory = sqlite3.Row
+            if vendedor:
+                cur = conn.execute(
+                    'SELECT factura FROM transportadoras WHERE factura = ? AND vendedor = ?',
+                    (factura, vendedor)
+                )
+            else:
+                cur = conn.execute(
+                    'SELECT factura FROM transportadoras WHERE factura = ?',
+                    (factura,)
+                )
+            row = cur.fetchone()
+            conn.close()
+
+            if not row:
+                self.send_json(404, {'error': 'Factura no encontrada o no pertenece al vendedor'})
+                return
+        except Exception as e:
+            self.send_json(500, {'error': str(e)})
+            return
+
+        # Generar fecha DD/MM/YYYY
+        from datetime import datetime
+        fecha_hoy = datetime.now().strftime('%d/%m/%Y')
+
+        # Enviar a Google Apps Script (doPost)
+        sheets_url = os.environ.get('SHEETS_URL', '')
+        if not sheets_url:
+            self.send_json(500, {'error': 'SHEETS_URL no configurada'})
+            return
+
+        try:
+            post_data = json.dumps({
+                'hoja': f'{bodega}-transportadoras',
+                'factura': factura,
+                'valor': fecha_hoy
+            }).encode('utf-8')
+
+            req = urllib.request.Request(
+                sheets_url,
+                data=post_data,
+                headers={'Content-Type': 'application/json'},
+                method='POST'
+            )
+            with urllib.request.urlopen(req, timeout=30) as response:
+                text = response.read().decode('utf-8').strip()
+                if text.startswith('while(1);'):
+                    text = text[11:].strip()
+                if text.startswith(')'):
+                    text = text[1:].strip()
+                result = json.loads(text)
+
+            if not result.get('ok'):
+                self.send_json(500, {'error': result.get('error', 'Error en Apps Script')})
+                return
+
+            # Actualizar SQLite local
+            conn = sqlite3.connect(db_path)
+            conn.execute(
+                'UPDATE transportadoras SET confirmado_app_vendedor = ? WHERE factura = ?',
+                (fecha_hoy, factura)
+            )
+            conn.commit()
+            conn.close()
+
+            self.send_json(200, {'ok': True, 'factura': factura, 'fecha': fecha_hoy})
+        except Exception as e:
+            self.send_json(500, {'error': f'Error escribiendo en Sheets: {e}'})
 
     def handle_create_vendedor(self):
         length = int(self.headers.get('Content-Length', 0))

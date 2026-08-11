@@ -16,6 +16,8 @@ let editingVendedorId = null;
 const cartKey = `carrito_${company}`;
 let manifiestoSearch = '';
 let manifiestosAbort = null;
+let allTransportadoras = [];
+let confirmarSearch = '';
 
 function checkAuth() {
   if (localStorage.getItem(sessionKey) !== 'true') {
@@ -518,6 +520,126 @@ function setupManifiestosFilter() {
   });
 }
 
+/* ===== Transportadoras / Confirmar despachos ===== */
+
+async function loadTransportadoras() {
+  const loading = document.getElementById('confirmar-loading');
+  const empty = document.getElementById('confirmar-empty');
+  const cards = document.getElementById('confirmar-cards');
+
+  const url = isAdmin
+    ? `/api/transportadoras?bodega=${company}`
+    : `/api/transportadoras?bodega=${company}&vendedor=${encodeURIComponent(vendedorName)}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    loading.classList.add('hidden');
+
+    if (!response.ok || data.error) {
+      loading.textContent = data.error || 'Error cargando despachos';
+      loading.classList.remove('hidden');
+      return;
+    }
+
+    allTransportadoras = data.transportadoras || [];
+    renderConfirmar();
+  } catch (err) {
+    loading.textContent = 'Error de conexión';
+    loading.classList.remove('hidden');
+  }
+}
+
+function renderConfirmar() {
+  const wrap = document.getElementById('confirmar-cards');
+  const empty = document.getElementById('confirmar-empty');
+  if (!wrap || !empty) return;
+
+  const term = confirmarSearch.toLowerCase().trim();
+
+  let filtered = allTransportadoras;
+  if (term) {
+    filtered = filtered.filter(row => {
+      const f = (row.factura || '').toString().toLowerCase();
+      const c = (row.cliente || '').toString().toLowerCase();
+      const ci = (row.ciudad || '').toString().toLowerCase();
+      return f.includes(term) || c.includes(term) || ci.includes(term);
+    });
+  }
+
+  if (filtered.length === 0) {
+    wrap.classList.add('hidden');
+    empty.classList.remove('hidden');
+    return;
+  }
+
+  empty.classList.add('hidden');
+  wrap.innerHTML = filtered.map(row => {
+    const confirmado = (row.confirmado_app_vendedor || '').toString().trim();
+    const isConfirmed = confirmado !== '';
+    return `
+      <div class="confirmar-card${isConfirmed ? ' confirmed' : ''}" data-factura="${escapeHtml(row.factura)}">
+        <div class="confirmar-card-header">
+          <span class="confirmar-factura">${escapeHtml(row.factura)}</span>
+          ${isConfirmed ? '<span class="confirmar-badge">✓ ' + escapeHtml(confirmado) + '</span>' : ''}
+        </div>
+        <div class="confirmar-card-body">
+          <div><strong>Cliente:</strong> ${escapeHtml(row.cliente)}</div>
+          <div><strong>Ciudad:</strong> ${escapeHtml(row.ciudad)}</div>
+          <div><strong>Dirección:</strong> ${escapeHtml(row.direccion)}</div>
+          <div><strong>Despacho:</strong> ${escapeHtml(row.fechadespacho)}</div>
+          <div><strong>Vendedor:</strong> ${escapeHtml(row.vendedor)}</div>
+        </div>
+        <button class="confirmar-btn" data-factura="${escapeHtml(row.factura)}"
+                ${isConfirmed ? 'disabled' : ''}>
+          ${isConfirmed ? 'Confirmado' : 'Confirmar despacho'}
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  wrap.querySelectorAll('.confirmar-btn:not([disabled])').forEach(btn => {
+    btn.addEventListener('click', () => confirmarTransportadora(btn.dataset.factura));
+  });
+
+  wrap.classList.remove('hidden');
+}
+
+async function confirmarTransportadora(factura) {
+  if (!confirm(`¿Confirmar despacho de la factura ${factura}?`)) return;
+
+  try {
+    const response = await fetch('/api/confirmar-transportadora', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bodega: company,
+        factura: factura,
+        vendedor: isAdmin ? '' : vendedorName
+      })
+    });
+    const result = await response.json();
+
+    if (response.ok && result.ok) {
+      showToast(`Factura ${factura} confirmada`, 'success');
+      loadTransportadoras();
+    } else {
+      showToast(result.error || 'Error al confirmar', 'error');
+    }
+  } catch (err) {
+    showToast('Error de conexión', 'error');
+  }
+}
+
+function setupConfirmarFilter() {
+  const input = document.getElementById('search-confirmar');
+  if (!input) return;
+  input.addEventListener('input', (e) => {
+    confirmarSearch = e.target.value;
+    renderConfirmar();
+  });
+}
+
 async function loadVendedores() {
   const loading = document.getElementById('vendedores-loading');
   const empty = document.getElementById('vendedores-empty');
@@ -695,6 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-cartera').addEventListener('click', () => showSection('cartera'));
   document.getElementById('btn-vendedores').addEventListener('click', () => showSection('vendedores'));
   document.getElementById('btn-manifiestos').addEventListener('click', () => showSection('manifiestos'));
+  document.getElementById('btn-confirmar').addEventListener('click', () => showSection('confirmar'));
   document.getElementById('btn-empresas').addEventListener('click', () => {
     window.location.href = '/';
   });
@@ -711,6 +834,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setupFilters();
   loadManifiestos();
   setupManifiestosFilter();
+  loadTransportadoras();
+  setupConfirmarFilter();
   updateCartButton();
 
   const cartFab = document.getElementById('cart-fab');

@@ -1128,3 +1128,87 @@ button:hover {
     flex-direction: column;
   }
 }
+
+/* Seccion Confirmar despachos */
+.confirmar-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: clamp(12px, 3vw, 16px);
+}
+
+.confirmar-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: clamp(16px, 4vw, 20px);
+  transition: border-color 0.15s;
+}
+
+.confirmar-card.confirmed {
+  border-color: rgba(52, 211, 153, 0.4);
+  background: rgba(52, 211, 153, 0.06);
+}
+
+.confirmar-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.confirmar-factura {
+  font-weight: 700;
+  color: var(--company-text);
+  text-transform: uppercase;
+  font-size: clamp(0.85rem, 2.6vw, 0.95rem);
+}
+
+.confirmar-badge {
+  color: #34d399;
+  font-size: clamp(0.7rem, 2vw, 0.8rem);
+  font-weight: 600;
+}
+
+.confirmar-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  font-size: clamp(0.8rem, 2.4vw, 0.9rem);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.confirmar-card-body strong {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.confirmar-btn {
+  width: 100%;
+  padding: clamp(10px, 3vw, 14px);
+  margin: 0;
+  background: var(--company-color);
+  border: 1px solid var(--company-text);
+  color: #fff;
+  border-radius: 10px;
+  font-size: clamp(0.8rem, 2.4vw, 0.9rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.confirmar-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.confirmar-btn:disabled {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.4);
+  color: #34d399;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
