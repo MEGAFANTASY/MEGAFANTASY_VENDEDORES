@@ -179,6 +179,21 @@
     </div>
   </div>
 
+  <div id="confirmar-fecha-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h3>Confirmar despacho</h3>
+      <p id="confirmar-fecha-factura" style="margin-bottom: 16px; text-align: center;"></p>
+      <label for="confirmar-fecha-input">Fecha de confirmación</label>
+      <input type="date" id="confirmar-fecha-input" />
+      <div id="confirmar-fecha-error" class="error"></div>
+      <div class="modal-actions">
+        <button type="button" id="btn-cancelar-fecha" class="nav-btn">Cancelar</button>
+        <button type="button" id="btn-confirmar-fecha" class="nav-btn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="admin.js"></script>
 </body>
 </html>

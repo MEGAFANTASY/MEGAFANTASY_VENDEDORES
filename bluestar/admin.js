@@ -557,7 +557,11 @@ function renderConfirmar() {
 
   const term = confirmarSearch.toLowerCase().trim();
 
-  let filtered = allTransportadoras;
+  let filtered = allTransportadoras.filter(row => {
+    const confirmadoG = (row.confirmado || '').toString().trim();
+    const confirmadoH = (row.confirmado_app_vendedor || '').toString().trim();
+    return confirmadoG === '' && confirmadoH === '';
+  });
   if (term) {
     filtered = filtered.filter(row => {
       const f = (row.factura || '').toString().toLowerCase();
@@ -605,8 +609,71 @@ function renderConfirmar() {
   wrap.classList.remove('hidden');
 }
 
-async function confirmarTransportadora(factura) {
-  if (!confirm(`¿Confirmar despacho de la factura ${factura}?`)) return;
+let pendingConfirmarFactura = null;
+
+function openConfirmarFechaModal(factura) {
+  pendingConfirmarFactura = factura;
+  const modal = document.getElementById('confirmar-fecha-modal');
+  const facturaEl = document.getElementById('confirmar-fecha-factura');
+  const input = document.getElementById('confirmar-fecha-input');
+  const errorEl = document.getElementById('confirmar-fecha-error');
+
+  facturaEl.textContent = `Factura: ${factura}`;
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  input.value = `${yyyy}-${mm}-${dd}`;
+  errorEl.textContent = '';
+  modal.classList.remove('hidden');
+  setTimeout(() => input.focus(), 50);
+}
+
+function closeConfirmarFechaModal() {
+  const modal = document.getElementById('confirmar-fecha-modal');
+  if (modal) modal.classList.add('hidden');
+  pendingConfirmarFactura = null;
+}
+
+async function submitConfirmarFecha() {
+  const input = document.getElementById('confirmar-fecha-input');
+  const errorEl = document.getElementById('confirmar-fecha-error');
+  const btnConfirmar = document.getElementById('btn-confirmar-fecha');
+  const btnCancelar = document.getElementById('btn-cancelar-fecha');
+  const value = (input.value || '').trim();
+
+  if (!value) {
+    errorEl.textContent = 'Selecciona una fecha';
+    return;
+  }
+
+  const parts = value.split('-');
+  if (parts.length !== 3) {
+    errorEl.textContent = 'Fecha inválida';
+    return;
+  }
+  const fechaTrim = `${parts[2]}/${parts[1]}/${parts[0]}`;
+  const factura = pendingConfirmarFactura;
+  if (!factura) return;
+
+  // Bloquear botones y mostrar estado de carga
+  btnConfirmar.disabled = true;
+  btnCancelar.disabled = true;
+  btnConfirmar.textContent = 'Confirmando...';
+  errorEl.textContent = '';
+
+  // Marcar la tarjeta como confirmando inmediatamente
+  const card = document.querySelector(`.confirmar-card[data-factura="${CSS.escape(factura)}"]`);
+  if (card) {
+    const btn = card.querySelector('.confirmar-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Confirmando...';
+    }
+  }
+
+  // Cerrar el modal inmediatamente
+  closeConfirmarFechaModal();
 
   try {
     const response = await fetch('/api/confirmar-transportadora', {
@@ -615,20 +682,44 @@ async function confirmarTransportadora(factura) {
       body: JSON.stringify({
         bodega: company,
         factura: factura,
-        vendedor: isAdmin ? '' : vendedorName
+        vendedor: isAdmin ? '' : vendedorName,
+        fecha: fechaTrim
       })
     });
     const result = await response.json();
 
     if (response.ok && result.ok) {
-      showToast(`Factura ${factura} confirmada`, 'success');
+      showToast(`Factura ${factura} confirmada con fecha ${fechaTrim}`, 'success');
       loadTransportadoras();
     } else {
       showToast(result.error || 'Error al confirmar', 'error');
+      // Restaurar la tarjeta si falla
+      if (card) {
+        const btn = card.querySelector('.confirmar-btn');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Confirmar despacho';
+        }
+      }
     }
   } catch (err) {
     showToast('Error de conexión', 'error');
+    if (card) {
+      const btn = card.querySelector('.confirmar-btn');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Confirmar despacho';
+      }
+    }
+  } finally {
+    btnConfirmar.disabled = false;
+    btnCancelar.disabled = false;
+    btnConfirmar.textContent = 'Confirmar';
   }
+}
+
+async function confirmarTransportadora(factura) {
+  openConfirmarFechaModal(factura);
 }
 
 function setupConfirmarFilter() {
@@ -852,6 +943,20 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     e.stopPropagation();
     clearCart();
+  });
+
+  const fechaBackdrop = document.querySelector('#confirmar-fecha-modal .modal-backdrop');
+  if (fechaBackdrop) fechaBackdrop.addEventListener('click', closeConfirmarFechaModal);
+  const btnCancelarFecha = document.getElementById('btn-cancelar-fecha');
+  if (btnCancelarFecha) btnCancelarFecha.addEventListener('click', closeConfirmarFechaModal);
+  const btnConfirmarFecha = document.getElementById('btn-confirmar-fecha');
+  if (btnConfirmarFecha) btnConfirmarFecha.addEventListener('click', submitConfirmarFecha);
+  const fechaInput = document.getElementById('confirmar-fecha-input');
+  if (fechaInput) fechaInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitConfirmarFecha();
+    }
   });
 
   if (isAdmin) {

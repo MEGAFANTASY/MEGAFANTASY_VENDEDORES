@@ -172,9 +172,24 @@
         <div id="cart-items-list" class="cart-items-list"></div>
       </div>
       <div class="modal-actions">
-        <button id="btn-cerrar-cart" class="nav-btn" type="button">Cerrar</button>
-        <button id="btn-vaciar-cart" class="nav-btn" type="button">Vaciar</button>
-        <button id="btn-liquidar-cart" class="nav-btn" type="button">Hacer liquidación</button>
+        <button type="button" id="btn-cerrar-cart" class="nav-btn">Cerrar</button>
+        <button type="button" id="btn-vaciar-cart" class="nav-btn">Vaciar</button>
+        <button type="button" id="btn-liquidar-cart" class="nav-btn">Hacer liquidación</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmar-fecha-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h3>Confirmar despacho</h3>
+      <p id="confirmar-fecha-factura" style="margin-bottom: 16px; text-align: center;"></p>
+      <label for="confirmar-fecha-input">Fecha de confirmación</label>
+      <input type="date" id="confirmar-fecha-input" />
+      <div id="confirmar-fecha-error" class="error"></div>
+      <div class="modal-actions">
+        <button type="button" id="btn-cancelar-fecha" class="nav-btn">Cancelar</button>
+        <button type="button" id="btn-confirmar-fecha" class="nav-btn">Confirmar</button>
       </div>
     </div>
   </div>

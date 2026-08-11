@@ -1212,3 +1212,20 @@ button:hover {
   transform: none;
   box-shadow: none;
 }
+
+#confirmar-fecha-input {
+  color-scheme: dark;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.95);
+  padding: clamp(12px, 3.5vw, 14px) clamp(14px, 4vw, 16px);
+  font-size: 16px;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+#confirmar-fecha-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+  cursor: pointer;
+}

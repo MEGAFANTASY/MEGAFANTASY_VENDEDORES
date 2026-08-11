@@ -334,9 +334,11 @@ class SPAHandler(SimpleHTTPRequestHandler):
             self.send_json(500, {'error': str(e)})
             return
 
-        # Generar fecha DD/MM/YYYY
+        # Fecha enviada por el frontend o fecha de hoy por defecto
         from datetime import datetime
-        fecha_hoy = datetime.now().strftime('%d/%m/%Y')
+        fecha_hoy = data.get('fecha', '').strip()
+        if not fecha_hoy:
+            fecha_hoy = datetime.now().strftime('%d/%m/%Y')
 
         # Enviar a Google Apps Script (doPost)
         sheets_url = os.environ.get('SHEETS_URL', '')
