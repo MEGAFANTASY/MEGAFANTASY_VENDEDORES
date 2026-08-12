@@ -15,7 +15,22 @@ COLUMNS = ['fecha', 'vendedor', 'cliente', 'direccion', 'ciudad', 'factura', 'to
 MANIFIESTOS_COLUMNS = ['referencia', 'descripcion', 'url_manifiesto']
 
 TRANSPORTADORAS_COLUMNS = ['factura', 'fechadespacho', 'cliente', 'direccion',
-                           'ciudad', 'vendedor', 'confirmado', 'confirmado_app_vendedor']
+                           'ciudad', 'vendedor', 'confirmado', 'confirmadoappvendedor']
+
+def normalize_keys(rows):
+    """Normaliza las claves de cada fila quitando guiones bajos y espacios."""
+    result = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        new_row = {}
+        for key, value in row.items():
+            if key is None:
+                continue
+            norm_key = str(key).strip().replace('_', '').replace(' ', '').lower()
+            new_row[norm_key] = value
+        result.append(new_row)
+    return result
 
 def fetch_data(bodega):
     if not SHEETS_URL:
@@ -118,7 +133,7 @@ def update_transportadoras(bodega, rows):
     conn.execute('CREATE INDEX IF NOT EXISTS idx_transportadoras_factura ON transportadoras(factura)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_transportadoras_vendedor ON transportadoras(vendedor)')
     conn.execute('DELETE FROM transportadoras')
-    for row in rows:
+    for row in normalize_keys(rows):
         values = [row.get(col, '') for col in TRANSPORTADORAS_COLUMNS]
         conn.execute('''
             INSERT OR REPLACE INTO transportadoras

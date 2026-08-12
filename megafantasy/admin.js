@@ -591,7 +591,7 @@ function renderConfirmar() {
           <div><strong>Cliente:</strong> ${escapeHtml(row.cliente)}</div>
           <div><strong>Ciudad:</strong> ${escapeHtml(row.ciudad)}</div>
           <div><strong>Dirección:</strong> ${escapeHtml(row.direccion)}</div>
-          <div><strong>Despacho:</strong> ${escapeHtml(row.fechadespacho)}</div>
+          <div><strong>Fecha Despacho:</strong> ${formatDate(row.fechadespacho)}</div>
           <div><strong>Vendedor:</strong> ${escapeHtml(row.vendedor)}</div>
         </div>
         <button class="confirmar-btn" data-factura="${escapeHtml(row.factura)}"

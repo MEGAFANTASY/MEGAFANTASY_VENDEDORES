@@ -281,7 +281,7 @@ class SPAHandler(SimpleHTTPRequestHandler):
             if vendedor:
                 query += ' WHERE vendedor = ?'
                 args.append(vendedor)
-            query += ' ORDER BY fechadespacho DESC'
+            query += ' ORDER BY fechadespacho ASC'
             cur = conn.execute(query, args)
             rows = [dict(row) for row in cur.fetchall()]
             conn.close()
