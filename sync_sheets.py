@@ -8,7 +8,7 @@ import time
 BODEGAS = ['megafantasy', 'bluestar', 'nexus', 'megaworld', 'elitech']
 DATA_DIR = '/data'
 SHEETS_URL = os.environ.get('SHEETS_URL', '')
-SYNC_INTERVAL = int(os.environ.get('SYNC_INTERVAL', '300'))
+SYNC_INTERVAL = int(os.environ.get('SYNC_INTERVAL', '1200'))
 
 COLUMNS = ['fecha', 'vendedor', 'cliente', 'direccion', 'ciudad', 'factura', 'total', 'saldo', 'dias', 'estatus', 'flete', 'url_factura', 'url_guia']
 
