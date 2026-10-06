@@ -1,11 +1,11 @@
 :root {
-  --company-color: #b45309;
-  --company-rgb: 180, 83, 9;
-  --company-text: #fdba74;
-  --company-glow: rgba(253, 186, 116, 0.45);
-  --company-light: rgba(253, 186, 116, 0.55);
-  --company-focus: rgba(253, 186, 116, 0.25);
-  --company-hover: rgba(217, 119, 6, 0.95);
+  --company-color: #dc2626;
+  --company-rgb: 220, 38, 38;
+  --company-text: #fca5a5;
+  --company-glow: rgba(252, 165, 165, 0.45);
+  --company-light: rgba(252, 165, 165, 0.55);
+  --company-focus: rgba(252, 165, 165, 0.25);
+  --company-hover: rgba(239, 68, 68, 0.95);
 }
 
 * {
@@ -203,6 +203,23 @@ button:hover {
   text-transform: uppercase;
   white-space: nowrap;
   text-shadow: 0 0 14px var(--company-glow);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.admin-nav .brand.brand-disabled {
+  cursor: default;
+}
+
+.admin-nav .brand:not(.brand-disabled):hover {
+  opacity: 0.85;
+}
+
+.admin-nav .brand.syncing {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 .admin-nav .nav-actions {

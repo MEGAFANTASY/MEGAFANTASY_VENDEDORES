@@ -357,6 +357,51 @@ function updateCiudadesTrigger() {
   }
 }
 
+function setupBrandButton() {
+  const btn = document.getElementById('brand-btn');
+  if (!btn) return;
+
+  if (!isAdmin) {
+    btn.disabled = true;
+    btn.classList.add('brand-disabled');
+    btn.title = '';
+    return;
+  }
+
+  btn.addEventListener('click', async () => {
+    if (btn.classList.contains('syncing')) return;
+    btn.classList.add('syncing');
+    const originalText = btn.textContent;
+    btn.textContent = 'Sincronizando...';
+
+    try {
+      const response = await fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bodega: company })
+      });
+      const result = await response.json();
+
+      if (response.ok && result.ok) {
+        showToast('Sincronizacion iniciada. Recargando datos...', 'success');
+        // Esperar unos segundos para que termine la sincronizacion en segundo plano
+        await new Promise(r => setTimeout(r, 3000));
+        if (document.getElementById('section-cartera').classList.contains('active')) await loadCartera();
+        if (document.getElementById('section-manifiestos').classList.contains('active')) await loadManifiestos();
+        if (document.getElementById('section-confirmar').classList.contains('active')) await loadTransportadoras();
+        showToast('Sincronizacion completada', 'success');
+      } else {
+        showToast(result.error || 'Error al sincronizar', 'error');
+      }
+    } catch (err) {
+      showToast('Error de red al sincronizar', 'error');
+    } finally {
+      btn.classList.remove('syncing');
+      btn.textContent = originalText;
+    }
+  });
+}
+
 function setupCiudadesFilter() {
   const dropdown = document.getElementById('ciudades-dropdown');
   const trigger = document.getElementById('ciudades-trigger');
@@ -904,6 +949,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnVendedores = document.getElementById('btn-vendedores');
     if (btnVendedores) btnVendedores.classList.add('hidden');
   }
+
+  setupBrandButton();
 
   document.getElementById('btn-cartera').addEventListener('click', () => showSection('cartera'));
   document.getElementById('btn-vendedores').addEventListener('click', () => showSection('vendedores'));

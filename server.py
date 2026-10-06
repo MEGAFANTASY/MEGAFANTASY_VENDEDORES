@@ -5,11 +5,16 @@ import json
 import sqlite3
 import urllib.parse
 import urllib.request
+import threading
+
+from sync_core import BODEGAS as CORE_BODEGAS, sync_bodega
 
 DATA_DIR = '/data'
 BODEGAS = ['megafantasy', 'bluestar', 'nexus', 'megaworld', 'elitech']
 ADMIN_USER = os.environ.get('ADMIN_USER', 'admin')
 ADMIN_PASS = os.environ.get('ADMIN_PASS', 'admin')
+
+sync_lock = threading.Lock()
 
 class SPAHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
@@ -48,6 +53,11 @@ class SPAHandler(SimpleHTTPRequestHandler):
             self.handle_transportadoras()
             return
 
+        # API: sincronizar manualmente una bodega
+        if self.path == '/api/sync':
+            self.handle_sync_bodega()
+            return
+
         return super().do_GET()
 
     def end_headers(self):
@@ -65,6 +75,9 @@ class SPAHandler(SimpleHTTPRequestHandler):
             return
         if self.path == '/api/confirmar-transportadora':
             self.handle_confirmar_transportadora()
+            return
+        if self.path == '/api/sync':
+            self.handle_sync_bodega()
             return
         self.send_error(404)
 
@@ -127,6 +140,29 @@ class SPAHandler(SimpleHTTPRequestHandler):
             print(f'Error validando vendedor {bodega}: {e}')
 
         self.send_json(401, {'error': 'Credenciales incorrectas'})
+
+    def handle_sync_bodega(self):
+        data = self._read_json_body()
+        if data is None:
+            return
+
+        bodega = data.get('bodega', '').strip().lower()
+        if bodega not in CORE_BODEGAS:
+            self.send_json(400, {'error': 'Bodega no valida'})
+            return
+
+        if not sync_lock.acquire(blocking=False):
+            self.send_json(429, {'error': 'Sincronizacion en progreso, intente en unos segundos'})
+            return
+
+        def run_sync():
+            try:
+                sync_bodega(bodega)
+            finally:
+                sync_lock.release()
+
+        threading.Thread(target=run_sync, daemon=True).start()
+        self.send_json(200, {'ok': True, 'bodega': bodega, 'message': 'Sincronizacion iniciada'})
 
     def handle_cartera(self):
         parsed = urllib.parse.urlparse(self.path)
@@ -500,6 +536,7 @@ class SPAHandler(SimpleHTTPRequestHandler):
         self.send_header('Content-Length', str(len(content)))
         self.end_headers()
         self.wfile.write(content)
+
 
     def translate_path(self, path):
         root = self.directory or os.getcwd()
