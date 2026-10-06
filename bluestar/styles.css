@@ -1,11 +1,11 @@
 :root {
-  --company-color: #dc2626;
-  --company-rgb: 220, 38, 38;
-  --company-text: #fca5a5;
-  --company-glow: rgba(252, 165, 165, 0.45);
-  --company-light: rgba(252, 165, 165, 0.55);
-  --company-focus: rgba(252, 165, 165, 0.25);
-  --company-hover: rgba(239, 68, 68, 0.95);
+  --company-color: #2563eb;
+  --company-rgb: 37, 99, 235;
+  --company-text: #93c5fd;
+  --company-glow: rgba(147, 197, 253, 0.45);
+  --company-light: rgba(147, 197, 253, 0.55);
+  --company-focus: rgba(147, 197, 253, 0.25);
+  --company-hover: rgba(59, 130, 246, 0.95);
 }
 
 * {
@@ -16,7 +16,6 @@
 
 html {
   font-size: clamp(14px, 2vw, 18px);
-  background: #0f172a;
 }
 
 body {
@@ -101,13 +100,13 @@ button {
   letter-spacing: clamp(0.5px, 0.2vw, 2px);
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 18px var(--company-glow);
 }
 
 button:hover {
   transform: translateY(-1px);
   background: var(--company-hover);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 26px var(--company-glow);
 }
 
 .back {
@@ -133,50 +132,6 @@ button:hover {
 @media (max-width: 360px) {
   body { padding: 14px; }
 }
-
-/* Toast notifications */
-.toast {
-  position: fixed;
-  bottom: clamp(20px, 5vw, 32px);
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  z-index: 300;
-  max-width: min(420px, 90vw);
-  padding: clamp(12px, 3.5vw, 16px) clamp(18px, 4vw, 24px);
-  border-radius: 14px;
-  font-size: clamp(0.85rem, 2.6vw, 0.95rem);
-  font-weight: 500;
-  color: #fff;
-  background: rgba(15, 23, 42, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  text-align: center;
-  line-height: 1.4;
-}
-
-.toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-.toast.success {
-  border-color: rgba(52, 211, 153, 0.55);
-  color: #34d399;
-}
-
-.toast.error {
-  border-color: rgba(248, 113, 113, 0.55);
-  color: #f87171;
-}
-
-.toast.warning {
-  border-color: rgba(251, 191, 36, 0.55);
-  color: #fbbf24;
-}
-
 /* Admin panel styles */
 .admin-nav {
   position: fixed;
@@ -188,7 +143,7 @@ button:hover {
   align-items: center;
   justify-content: space-between;
   gap: clamp(8px, 2vw, 16px);
-  padding: calc(clamp(10px, 3vw, 14px) + env(safe-area-inset-top)) clamp(12px, 4vw, 24px) clamp(10px, 3vw, 14px);
+  padding: clamp(10px, 3vw, 14px) clamp(12px, 4vw, 24px);
   background: rgba(15, 23, 42, 0.85);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(18px);
@@ -203,23 +158,6 @@ button:hover {
   text-transform: uppercase;
   white-space: nowrap;
   text-shadow: 0 0 14px var(--company-glow);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.admin-nav .brand.brand-disabled {
-  cursor: default;
-}
-
-.admin-nav .brand:not(.brand-disabled):hover {
-  opacity: 0.85;
-}
-
-.admin-nav .brand.syncing {
-  opacity: 0.7;
-  cursor: wait;
 }
 
 .admin-nav .nav-actions {
@@ -435,44 +373,6 @@ button:hover {
   font-size: clamp(0.85rem, 2.6vw, 0.95rem);
 }
 
-#search-manifiestos {
-  width: 100%;
-  flex: none;
-  margin-bottom: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-}
-
-#section-manifiestos .filter-row {
-  position: sticky;
-  top: calc(clamp(80px, 18vw, 110px) - clamp(24px, 5vw, 40px) + 12px);
-  z-index: 70;
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding: clamp(10px, 3vw, 14px) clamp(14px, 4vw, 18px);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-  margin-bottom: clamp(18px, 4vw, 24px);
-}
-
-#section-manifiestos .cartera-header {
-  margin-bottom: clamp(18px, 4vw, 24px);
-}
-
-#section-manifiestos .table-wrap {
-  margin-top: clamp(12px, 3vw, 18px);
-}
-
-@media (max-width: 720px) {
-  #section-manifiestos .filter-row {
-    top: calc(clamp(80px, 18vw, 110px) - clamp(16px, 4vw, 24px) + 10px);
-  }
-}
-
 #search-cartera::placeholder,
 .search-input::placeholder {
   color: rgba(255, 255, 255, 0.4);
@@ -529,32 +429,6 @@ button:hover {
   z-index: 50;
   padding: 8px 0;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-}
-
-@media (max-width: 720px) {
-  .ciudades-panel {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    right: auto;
-    width: min(340px, 92vw);
-    max-height: min(420px, 70vh);
-    transform: translate(-50%, -50%);
-    border-radius: 16px;
-    z-index: 200;
-    padding: 12px 0;
-  }
-
-  .ciudades-panel::before {
-    content: '';
-    position: fixed;
-    top: -200vh;
-    left: -200vw;
-    right: -200vw;
-    bottom: -200vh;
-    background: rgba(0, 0, 0, 0.65);
-    z-index: -1;
-  }
 }
 
 .limpiar-ciudades {
@@ -649,22 +523,11 @@ button:hover {
   .cartera-filters {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
   }
 
   .filter-row {
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
-  }
-
-  .ciudades-dropdown,
-  .status-filters {
-    width: 100%;
-  }
-
-  .ciudades-trigger {
-    width: 100%;
   }
 
   #search-cartera,
@@ -708,174 +571,6 @@ button:hover {
   transform: scale(1.1);
 }
 
-.cart-add-btn {
-  background: rgba(var(--company-rgb), 0.25);
-  border: 1px solid rgba(var(--company-rgb), 0.55);
-  color: var(--company-text);
-}
-
-.cart-add-btn:hover {
-  background: var(--company-color);
-  color: #fff;
-  transform: scale(1.1);
-}
-
-.cart-add-btn.in-cart {
-  background: #34d399;
-  border-color: #34d399;
-  color: #fff;
-  cursor: default;
-}
-
-.cart-fab {
-  position: fixed;
-  bottom: clamp(20px, 5vw, 28px);
-  right: clamp(20px, 5vw, 28px);
-  width: clamp(58px, 14vw, 72px);
-  height: clamp(58px, 14vw, 72px);
-  border-radius: 50%;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(1.4rem, 5vw, 1.8rem);
-  background: rgba(var(--company-rgb), 0.95);
-  border: 1px solid var(--company-text);
-  color: #fff;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-  z-index: 90;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.cart-fab:hover {
-  transform: scale(1.08);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-}
-
-.cart-count {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  min-width: 24px;
-  height: 24px;
-  padding: 0 6px;
-  border-radius: 12px;
-  background: #fff;
-  color: var(--company-color);
-  font-size: 0.75rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-}
-
-.cart-modal-content {
-  max-width: min(520px, 94vw);
-}
-
-.cart-detail-grid {
-  display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: 10px 14px;
-  align-items: start;
-  margin-bottom: clamp(18px, 4vw, 24px);
-}
-
-.cart-label {
-  color: rgba(255, 255, 255, 0.55);
-  font-size: clamp(0.75rem, 2.2vw, 0.85rem);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding-top: 2px;
-}
-
-.cart-value {
-  color: var(--company-text);
-  font-size: clamp(0.85rem, 2.6vw, 0.95rem);
-  font-weight: 600;
-  word-break: break-word;
-}
-
-.cart-value-long {
-  font-size: clamp(0.75rem, 2.2vw, 0.85rem);
-  font-weight: 500;
-}
-
-.cart-value-number {
-  color: #fff;
-  font-weight: 700;
-}
-
-.cart-items {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: clamp(12px, 3vw, 16px);
-  margin-bottom: clamp(18px, 4vw, 24px);
-}
-
-.cart-items-title {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: clamp(0.75rem, 2.2vw, 0.85rem);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 10px;
-}
-
-.cart-items-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  max-height: 140px;
-  overflow-y: auto;
-}
-
-.cart-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
-  font-size: clamp(0.75rem, 2.2vw, 0.85rem);
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.cart-item-factura {
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.cart-item-remove {
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  margin: 0;
-  border-radius: 50%;
-  background: rgba(255, 107, 107, 0.2);
-  border: 1px solid rgba(255, 107, 107, 0.5);
-  color: rgba(255, 107, 107, 0.95);
-  font-size: 0.7rem;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: none;
-}
-
-.cart-item-remove:hover {
-  background: rgba(255, 107, 107, 0.35);
-  transform: scale(1.1);
-  box-shadow: none;
-}
-
 .icon-disabled {
   opacity: 0.25;
   cursor: default;
@@ -898,11 +593,7 @@ button:hover {
   }
 
   .admin-main {
-    padding-top: calc(env(safe-area-inset-top) + clamp(148px, 38vw, 180px));
-  }
-
-  .cartera-header {
-    margin-top: clamp(10px, 3vw, 16px);
+    padding-top: clamp(120px, 30vw, 150px);
   }
 
   .data-table thead {
@@ -980,6 +671,7 @@ button:hover {
   margin-bottom: 6px;
   text-transform: uppercase;
   font-size: clamp(0.85rem, 2.6vw, 0.95rem);
+  text-shadow: 0 0 10px var(--company-glow);
 }
 
 .vendedor-usuario {
@@ -1131,6 +823,7 @@ button:hover {
 }
 
 .modal-actions .nav-btn:last-child:hover {
+  box-shadow: 0 0 20px var(--company-glow);
   background: var(--company-hover);
 }
 
@@ -1144,105 +837,4 @@ button:hover {
   .modal-actions {
     flex-direction: column;
   }
-}
-
-/* Seccion Confirmar despachos */
-.confirmar-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: clamp(12px, 3vw, 16px);
-}
-
-.confirmar-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  padding: clamp(16px, 4vw, 20px);
-  transition: border-color 0.15s;
-}
-
-.confirmar-card.confirmed {
-  border-color: rgba(52, 211, 153, 0.4);
-  background: rgba(52, 211, 153, 0.06);
-}
-
-.confirmar-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.confirmar-factura {
-  font-weight: 700;
-  color: var(--company-text);
-  text-transform: uppercase;
-  font-size: clamp(0.85rem, 2.6vw, 0.95rem);
-}
-
-.confirmar-badge {
-  color: #34d399;
-  font-size: clamp(0.7rem, 2vw, 0.8rem);
-  font-weight: 600;
-}
-
-.confirmar-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
-  font-size: clamp(0.8rem, 2.4vw, 0.9rem);
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.confirmar-card-body strong {
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 500;
-}
-
-.confirmar-btn {
-  width: 100%;
-  padding: clamp(10px, 3vw, 14px);
-  margin: 0;
-  background: var(--company-color);
-  border: 1px solid var(--company-text);
-  color: #fff;
-  border-radius: 10px;
-  font-size: clamp(0.8rem, 2.4vw, 0.9rem);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.confirmar-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-}
-
-.confirmar-btn:disabled {
-  background: rgba(52, 211, 153, 0.15);
-  border-color: rgba(52, 211, 153, 0.4);
-  color: #34d399;
-  cursor: default;
-  transform: none;
-  box-shadow: none;
-}
-
-#confirmar-fecha-input {
-  color-scheme: dark;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.95);
-  padding: clamp(12px, 3.5vw, 14px) clamp(14px, 4vw, 16px);
-  font-size: 16px;
-  width: 100%;
-  margin-bottom: 4px;
-}
-
-#confirmar-fecha-input::-webkit-calendar-picker-indicator {
-  filter: invert(0.8);
-  cursor: pointer;
 }
