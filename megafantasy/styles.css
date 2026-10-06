@@ -151,6 +151,7 @@ button:hover {
 }
 
 .admin-nav .brand {
+  display: inline;
   font-size: clamp(1rem, 4vw, 1.3rem);
   font-weight: 700;
   letter-spacing: 1px;
@@ -164,7 +165,10 @@ button:hover {
   padding: 0;
   margin: 0;
   text-align: left;
-  line-height: inherit;
+  line-height: normal;
+  vertical-align: baseline;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .admin-nav .brand.brand-disabled {
