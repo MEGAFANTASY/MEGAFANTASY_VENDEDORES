@@ -150,6 +150,12 @@ button:hover {
   -webkit-backdrop-filter: blur(18px);
 }
 
+.admin-nav .brand-wrap {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
 .admin-nav .brand {
   display: inline;
   font-size: clamp(1rem, 4vw, 1.3rem);
