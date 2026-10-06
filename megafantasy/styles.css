@@ -167,7 +167,7 @@ button:hover {
   text-shadow: 0 0 14px var(--company-glow);
   background: transparent;
   border: none;
-  cursor: pointer;
+  cursor: default;
   padding: 0;
   margin: 0;
   text-align: left;
@@ -175,18 +175,20 @@ button:hover {
   vertical-align: baseline;
   -webkit-appearance: none;
   appearance: none;
+  outline: none;
 }
 
 .admin-nav .brand.brand-disabled {
   cursor: default;
 }
 
-.admin-nav .brand:not(.brand-disabled):hover {
-  opacity: 0.85;
+.admin-nav .brand:not(.brand-disabled):hover,
+.admin-nav .brand:not(.brand-disabled):focus,
+.admin-nav .brand:not(.brand-disabled):active {
+  opacity: 1;
 }
 
 .admin-nav .brand.syncing {
-  opacity: 0.7;
   cursor: wait;
 }
 
